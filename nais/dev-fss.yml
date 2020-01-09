@@ -36,9 +36,9 @@ spec:
     path: /metrics
   vault:
     enabled: true
-      paths:  # Optional. If specified, will override default values with custom Vault configuration.
-        - mountPath: /var/run/secrets/nais.io/vault  # Filesystem path inside the pod where secrets will appear.
-          kvPath: /kv/preprod/fss/omsorgspenger-mottak/default  # Vault KV path to fetch secrets from.
+    paths:  # Optional. If specified, will override default values with custom Vault configuration.
+      - mountPath: /var/run/secrets/nais.io/vault  # Filesystem path inside the pod where secrets will appear.
+        kvPath: /kv/preprod/fss/omsorgspenger-mottak/default  # Vault KV path to fetch secrets from.
   webproxy: true
   env:
     - name: K9_DOKUMENT_BASE_URL
