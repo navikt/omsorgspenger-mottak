@@ -41,7 +41,7 @@ spec:
         kvPath: /kv/preprod/fss/omsorgspenger-mottak/default  # Vault KV path to fetch secrets from.
       - mountPath: /var/run/secrets/nais.io/azuread
         kvPath: /azuread/data/dev/creds/omsorgspenger-mottak
-      - mountPath: /var/run/secrets/nais.io/vault
+      - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: /serviceuser/dev/srvomsorgspeng-mtk
   webproxy: true
   env:
