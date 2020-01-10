@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-val dusseldorfKtorVersion = "1.2.3.b45ba92"
+val dusseldorfKtorVersion = "1.2.6.71b52a3"
 val ktorVersion = ext.get("ktorVersion").toString()
 val kafkaEmbeddedEnvVersion = "2.2.0"
 val kafkaVersion = "2.3.0" // Alligned med version fra kafka-embedded-env
@@ -19,37 +19,47 @@ buildscript {
     apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/b45ba92fbe655e1818374daf6465af5174a72183/gradle/dusseldorf-ktor.gradle.kts")
 }
 
+println("GITHUB_USERNAME=" + System.getenv("GITHUB_USERNAME"))
 
 repositories {
     maven("http://packages.confluent.io/maven/")
     jcenter()
     mavenLocal()
     mavenCentral()
+
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/navikt/dusseldorf-ktor")
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 
 dependencies {
     // Server
-    compile ( "no.nav.helse:dusseldorf-ktor-core:$dusseldorfKtorVersion")
-    compile ( "no.nav.helse:dusseldorf-ktor-jackson:$dusseldorfKtorVersion")
-    compile ( "no.nav.helse:dusseldorf-ktor-metrics:$dusseldorfKtorVersion")
-    compile ( "no.nav.helse:dusseldorf-ktor-health:$dusseldorfKtorVersion")
-    compile ( "no.nav.helse:dusseldorf-ktor-auth:$dusseldorfKtorVersion")
+    compile("no.nav.helse:dusseldorf-ktor-core:$dusseldorfKtorVersion")
+    compile("no.nav.helse:dusseldorf-ktor-jackson:$dusseldorfKtorVersion")
+    compile("no.nav.helse:dusseldorf-ktor-metrics:$dusseldorfKtorVersion")
+    compile("no.nav.helse:dusseldorf-ktor-health:$dusseldorfKtorVersion")
+    compile("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfKtorVersion")
 
     // Client
-    compile ( "no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
-    compile ( "no.nav.helse:dusseldorf-oauth2-client:$dusseldorfKtorVersion")
+    compile("no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
+    compile("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfKtorVersion")
 
     // Kafka
     compile("org.apache.kafka:kafka-clients:$kafkaVersion")
 
     // Test
-    testCompile  ("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion")
-    testCompile ( "no.nav.helse:dusseldorf-ktor-test-support:$dusseldorfKtorVersion")
-    testCompile ( "io.ktor:ktor-server-test-host:$ktorVersion") {
+    testCompile("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion")
+    testCompile("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
+    testCompile("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
-    testCompile( "org.skyscreamer:jsonassert:1.5.0")
+    testCompile("org.skyscreamer:jsonassert:1.5.0")
 }
 
 java {

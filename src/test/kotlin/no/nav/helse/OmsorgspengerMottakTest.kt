@@ -16,8 +16,8 @@ import io.ktor.util.KtorExperimentalAPI
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.dusseldorf.ktor.core.fromResources
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
-import no.nav.helse.dusseldorf.ktor.testsupport.jws.Azure
-import no.nav.helse.dusseldorf.ktor.testsupport.wiremock.WireMockBuilder
+import no.nav.helse.dusseldorf.testsupport.jws.Azure
+import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.mottak.v1.*
 import org.apache.commons.codec.binary.Base64
 import org.json.JSONObject
