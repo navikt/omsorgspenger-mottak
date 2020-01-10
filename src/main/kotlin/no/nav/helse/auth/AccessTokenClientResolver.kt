@@ -1,10 +1,8 @@
 package no.nav.helse.auth
 
 import no.nav.helse.dusseldorf.ktor.auth.Client
-import no.nav.helse.dusseldorf.ktor.auth.PrivateKeyClient
-import no.nav.helse.dusseldorf.oauth2.client.FromCertificateHexThumbprint
-import no.nav.helse.dusseldorf.oauth2.client.FromJwk
-import no.nav.helse.dusseldorf.oauth2.client.SignedJwtAccessTokenClient
+import no.nav.helse.dusseldorf.ktor.auth.ClientSecretClient
+import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -18,14 +16,12 @@ internal class AccessTokenClientResolver(
 
     private val azureV2Client = clients.getOrElse(AZURE_V2_ALIAS) {
         throw IllegalStateException("Client[$AZURE_V2_ALIAS] må være satt opp.")
-    } as PrivateKeyClient
+    } as ClientSecretClient
 
-
-    private val azureV2AccessTokenClient = SignedJwtAccessTokenClient(
-        clientId = azureV2Client.clientId(),
-        tokenEndpoint = azureV2Client.tokenEndpoint(),
-        privateKeyProvider = FromJwk(azureV2Client.privateKeyJwk),
-        keyIdProvider = FromCertificateHexThumbprint(azureV2Client.certificateHexThumbprint)
+    private val azureV2AccessTokenClient = ClientSecretAccessTokenClient(
+       clientId = azureV2Client.clientId(),
+        clientSecret = azureV2Client.clientSecret,
+        tokenEndpoint = azureV2Client.tokenEndpoint()
     )
 
     internal fun dokumentAccessTokenClient() = azureV2AccessTokenClient
