@@ -18,8 +18,8 @@ internal class AccessTokenClientResolver(
         throw IllegalStateException("Client[$AZURE_V2_ALIAS] må være satt opp.")
     } as ClientSecretClient
 
-    private val azureV2AccessTokenClient = ClientSecretAccessTokenClient(
-       clientId = azureV2Client.clientId(),
+    val azureV2AccessTokenClient = ClientSecretAccessTokenClient(
+        clientId = azureV2Client.clientId(),
         clientSecret = azureV2Client.clientSecret,
         tokenEndpoint = azureV2Client.tokenEndpoint()
     )
