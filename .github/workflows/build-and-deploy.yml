@@ -24,7 +24,9 @@ jobs:
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew -Pgpr.user=$GITHUB_USERNAME -Pgpr.key=$GITHUB_TOKEN check
+        run: |
+          echo $GITHUB_USERNAME
+          ./gradlew -Pgpr.user=$GITHUB_USERNAME -Pgpr.key=$GITHUB_TOKEN check
 
   build-code-and-push-docker:
     name: Build code and push docker image
