@@ -25,16 +25,23 @@ internal class SoknadV1MottakService(
     ) : SoknadId {
         val correlationId = CorrelationId(metadata.correlationId)
 
-        logger.trace("Lagrer vedlegg")
-        // TODO: Refaktorer slik at dette støtte både legeerklaring vedlegg og samversavtale vedlegg.
-        val vedleggUrls = lagreVedleg(
-            aktoerId = soknad.sokerAktoerId,
-            vedlegg = soknad.vedlegg,
+        logger.trace("Lagrer legeerklæringer")
+        val legeerklæringUrls = lagreVedleg(
+            aktoerId = soknad.søkerAktørId,
+            vedlegg = soknad.legeerklæring,
+            correlationId = correlationId
+        )
+
+        logger.trace("Lagrer samværsvtaler")
+        val samværsavtaleUrls = lagreVedleg(
+            aktoerId = soknad.søkerAktørId,
+            vedlegg = soknad.samværsavtale,
             correlationId = correlationId
         )
 
         val outgoing = soknad
-            .medVedleggUrls(vedleggUrls)
+            .medLegeerklæringUrls(legeerklæringUrls)
+            .medSamværsavtaleUrls(samværsavtaleUrls)
             .medSoknadId(soknadId)
             .somOutgoing()
 

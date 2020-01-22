@@ -218,11 +218,12 @@ class OmsorgspengerMottakTest {
         val ugyldigFnr = "290990123451"
         val soknad = """
         {
-            "soker": {
-                "fodselsnummer": "$ugyldigFnr",
-                "aktoer_id": "ABC"
+            "søker": {
+                "fødselsnummer": "$ugyldigFnr",
+                "aktørId": "ABC"
             },
-            vedlegg: []
+            legeerklæring: [],
+            samværsavtale: []
         }
         """.trimIndent()
 
@@ -238,17 +239,17 @@ class OmsorgspengerMottakTest {
                     "instance": "about:blank",
                     "invalid_parameters": [{
                         "type": "entity",
-                        "name": "vedlegg",
-                        "reason": "Det må sendes minst et vedlegg.",
+                        "name": "legeerklæring",
+                        "reason": "Det må sendes minst en legeerklæringsfil.",
                         "invalid_value": []
                     }, {
                         "type": "entity",
-                        "name": "soker.fodselsnummer",
+                        "name": "søker.fødselsnummer",
                         "reason": "Ikke gyldig fødselsnummer.",
                         "invalid_value": "$ugyldigFnr"
                     }, {
                         "type": "entity",
-                        "name": "soker.aktoer_id",
+                        "name": "søker.aktørId",
                         "reason": "Ikke gyldig Aktør ID.",
                         "invalid_value": "ABC"
                     }]
@@ -266,7 +267,8 @@ class OmsorgspengerMottakTest {
 
         val outgoingFromIncoming = SoknadV1Incoming(incomingJsonString)
             .medSoknadId(outgoing.soknadId)
-            .medVedleggUrls(outgoing.vedleggUrls)
+            .medLegeerklæringUrls(outgoing.legeerklæringUrls)
+            .medSamværsavtaleUrls(outgoing.samværrsavtaleUrls)
             .somOutgoing()
 
         JSONAssert.assertEquals(outgoingFromIncoming.jsonObject.toString(), outgoing.jsonObject.toString(), true)
@@ -318,11 +320,16 @@ class OmsorgspengerMottakTest {
     ) : String =
         """
         {
-            "soker": {
-                "fodselsnummer": "$fodselsnummerSoker",
-                "aktoer_id": "123456"
+            "søker": {
+                "fødselsnummer": "$fodselsnummerSoker",
+                "aktørId": "123456"
             },
-            vedlegg: [{
+            legeerklæring: [{
+                "content": "${Base64.encodeBase64String("iPhone_6.jpg".fromResources().readBytes())}",
+                "content_type": "image/jpeg",
+                "title": "Et fint bilde"
+            }],
+            samværsavtale: [{
                 "content": "${Base64.encodeBase64String("iPhone_6.jpg".fromResources().readBytes())}",
                 "content_type": "image/jpeg",
                 "title": "Et fint bilde"

@@ -7,12 +7,12 @@ import org.json.JSONObject
 import java.net.URI
 
 private object JsonKeys {
-    internal const val vedlegg = "vedlegg"
-    internal const val soker = "soker"
-    internal const val aktoerId = "aktoer_id"
-    internal const val vedleggUrls = "vedlegg_urls"
-    internal const val soknadId = "soknad_id"
-    internal const val fodselsnummer = "fodselsnummer"
+    internal const val legeerklæring = "legeerklæring"
+    internal const val samværsavtale = "samværsavtale"
+    internal const val søker = "søker"
+    internal const val aktørId = "aktørId"
+    internal const val søknadId = "søknadId"
+    internal const val fødselsnummer = "fødselsnummer"
     internal const val content = "content"
     internal const val contentType = "content_type"
     internal const val title = "title"
@@ -20,39 +20,51 @@ private object JsonKeys {
 
 internal class SoknadV1Incoming(json: String) {
     private val jsonObject = JSONObject(json)
-    internal val sokerFodselsNummer : String
-    internal val vedlegg: List<Vedlegg>
+    internal val søkerFødselsnummer: String
+    internal val legeerklæring: List<Vedlegg>
+    internal val samværsavtale: List<Vedlegg>
 
-    // TODO: Refaktorer slik at dette støtte både legeerklaring vedlegg og samversavtale vedlegg.
-    private fun hentVedlegg() : List<Vedlegg> {
-        val vedlegg = mutableListOf<Vedlegg>()
-        jsonObject.getJSONArray(JsonKeys.vedlegg).forEach {
+    private fun hentLegeerklæring(): List<Vedlegg> = vedleggsFilerTilJson(JsonKeys.legeerklæring).toList()
+
+    private fun hentSamværsavtale(): List<Vedlegg> = vedleggsFilerTilJson(JsonKeys.samværsavtale).toList()
+
+    private fun vedleggsFilerTilJson(jsonKey: String): MutableList<Vedlegg> {
+        val vedleggsFiler: MutableList<Vedlegg> = mutableListOf()
+        jsonObject.getJSONArray(jsonKey).forEach {
             val vedleggJson = it as JSONObject
-            vedlegg.add(Vedlegg(
-                content = Base64.decodeBase64(vedleggJson.getString(JsonKeys.content)),
-                contentType = vedleggJson.getString(JsonKeys.contentType),
-                title = vedleggJson.getString(JsonKeys.title)
-            ))
+            vedleggsFiler.add(
+                Vedlegg(
+                    content = Base64.decodeBase64(vedleggJson.getString(JsonKeys.content)),
+                    contentType = vedleggJson.getString(JsonKeys.contentType),
+                    title = vedleggJson.getString(JsonKeys.title)
+                )
+            )
         }
-        return vedlegg.toList()
+        return vedleggsFiler
     }
 
     init {
-        sokerFodselsNummer = jsonObject.getJSONObject(JsonKeys.soker).getString(JsonKeys.fodselsnummer)
-        vedlegg = hentVedlegg()
-        jsonObject.remove(JsonKeys.vedlegg)
+        søkerFødselsnummer = jsonObject.getJSONObject(JsonKeys.søker).getString(JsonKeys.fødselsnummer)
+        legeerklæring = hentLegeerklæring()
+        samværsavtale = hentSamværsavtale()
+        jsonObject.remove(JsonKeys.legeerklæring)
+        jsonObject.remove(JsonKeys.samværsavtale)
     }
 
-    internal val sokerAktoerId = AktoerId(jsonObject.getJSONObject(JsonKeys.soker).getString(JsonKeys.aktoerId))
+    internal val søkerAktørId = AktoerId(jsonObject.getJSONObject(JsonKeys.søker).getString(JsonKeys.aktørId))
 
-    // TODO: Refaktorer slik at dette støtte både legeerklaring vedlegg og samversavtale vedlegg.
-    internal fun medVedleggUrls(vedleggUrls: List<URI>) : SoknadV1Incoming {
-        jsonObject.put(JsonKeys.vedleggUrls, vedleggUrls)
+    internal fun medLegeerklæringUrls(vedleggUrls: List<URI>): SoknadV1Incoming {
+        jsonObject.put(JsonKeys.legeerklæring, vedleggUrls)
         return this
     }
 
-    internal fun medSoknadId(soknadId: SoknadId) : SoknadV1Incoming {
-        jsonObject.put(JsonKeys.soknadId, soknadId.id)
+    internal fun medSamværsavtaleUrls(vedleggUrls: List<URI>): SoknadV1Incoming {
+        jsonObject.put(JsonKeys.samværsavtale, vedleggUrls)
+        return this
+    }
+
+    internal fun medSoknadId(soknadId: SoknadId): SoknadV1Incoming {
+        jsonObject.put(JsonKeys.søknadId, soknadId.id)
         return this
     }
 
@@ -61,20 +73,22 @@ internal class SoknadV1Incoming(json: String) {
 }
 
 internal class SoknadV1Outgoing(internal val jsonObject: JSONObject) {
-    internal val soknadId = SoknadId(jsonObject.getString(JsonKeys.soknadId))
+    internal val soknadId = SoknadId(jsonObject.getString(JsonKeys.søknadId))
     // TODO: Refaktorer slik at dette støtte både legeerklaring vedlegg og samversavtale vedlegg.
-    internal val vedleggUrls = hentVedleggUrls()
-    private fun hentVedleggUrls() : List<URI> {
+    internal val legeerklæringUrls = hentVedleggUrls(JsonKeys.legeerklæring)
+    internal val samværrsavtaleUrls = hentVedleggUrls(JsonKeys.samværsavtale)
+
+    private fun hentVedleggUrls(jsonkey: String): List<URI> {
         val vedleggUrls = mutableListOf<URI>()
-        jsonObject.getJSONArray(JsonKeys.vedleggUrls).forEach {
+        jsonObject.getJSONArray(jsonkey).forEach {
             vedleggUrls.add(URI(it as String))
         }
         return vedleggUrls.toList()
     }
 }
 
-data class Vedlegg (
-    val content : ByteArray,
-    val contentType : String,
-    val title : String
+data class Vedlegg(
+    val content: ByteArray,
+    val contentType: String,
+    val title: String
 )
