@@ -38,25 +38,7 @@ attributten "data" er tilsvarende søknaden som kommer inn i REST-API'et med noe
 - "soknad_id" lagt til
 - Alle andre felter som har vært en del av JSON-meldingen som kom inn i REST-API'et vil også være en del av "data"-attributten i Kafka-meldingen.
 
-```json
-{
-	"metadata:": {
-		"version": 1,
-		"correlation_id": "b3106960-0a85-4e02-9221-6ae057c8e93f",
-		"request_id": "b3106960-0a85-4e02-9221-6ae05456asd841"
-	},
-	"data": {
-		"soknad_id": "ff106960-0a85-4e02-9221-6ae057c8e93f",
-		"soker": {
-			"aktoer_id": "1234567",
-			"fodselsnummer": "290990123456"
-		},
-		"vedlegg_urls": [
-			"https://k9-dokument/v1/b3106960-0a85-4e02-9221-6ae05456asd888"
-		]
-	}
-}
-```
+Se [her](https://navikt.github.io/omsorgspenger-mottak) for meldingsdefinisjon, med eksempler.
 
 ### Metadata
 #### Correlation ID vs Request ID
