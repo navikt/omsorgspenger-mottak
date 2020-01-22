@@ -14,14 +14,14 @@ info:
     url: "https://github.com/navikt/omsorgspenger-mottak/blob/master/LICENSE"
 
 tags:
-  - name: "MeldingV1"
-    description: "Melding å sende på kafka topic."
+  - name: "Utgående Meldinger"
+    description: "Videresending av søknader for prossesering."
 
 paths:
   privat-omsorgspengesoknad-mottatt:
     post:
       tags:
-        - "MeldingV1"
+        - "Utgående Meldinger"
       summary: "Topic for mottak av omsorgspengesøknader. Konsumeres av omsorgspengesoknad-prossesering"
       description: ""
       operationId: ""
