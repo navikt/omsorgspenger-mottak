@@ -219,7 +219,6 @@ class OmsorgspengerMottakTest {
         val soknad = """
         {
             "søker": {
-                "fødselsnummer": "$ugyldigFnr",
                 "aktørId": "ABC"
             },
             legeerklæring: [],
@@ -242,11 +241,6 @@ class OmsorgspengerMottakTest {
                         "name": "legeerklæring",
                         "reason": "Det må sendes minst en legeerklæringsfil.",
                         "invalid_value": []
-                    }, {
-                        "type": "entity",
-                        "name": "søker.fødselsnummer",
-                        "reason": "Ikke gyldig fødselsnummer.",
-                        "invalid_value": "$ugyldigFnr"
                     }, {
                         "type": "entity",
                         "name": "søker.aktørId",
