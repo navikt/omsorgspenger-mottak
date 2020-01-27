@@ -47,8 +47,6 @@ spec:
   env:
     - name: K9_DOKUMENT_BASE_URL
       value: https://k9-dokument.nais.preprod.local
-    - name: AZURE_CLIENT_ID
-      value: 8caa7c32-1523-43a7-af95-63123938f45c
     - name: AZURE_AUTHORIZED_CLIENTS
       value: 14f509d4-5f43-4e42-b551-d61db10972f2
     - name: AZURE_V1_DISCOVERY_ENDPOINT
