@@ -2,6 +2,7 @@ package no.nav.helse
 
 import io.ktor.server.testing.withApplication
 import no.nav.helse.dusseldorf.testsupport.asArguments
+import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -13,6 +14,9 @@ class OmsorgspengerMottakWithMocks {
 
         @JvmStatic
         fun main(args: Array<String>) {
+
+            val token = Azure.V2_0.generateJwt(clientId = "azure-client-2", audience = "omsorgspenger-mottak")
+            logger.info("Token ---> {}", token)
 
             val wireMockServer = WireMockBuilder()
                 .withPort(8141)
