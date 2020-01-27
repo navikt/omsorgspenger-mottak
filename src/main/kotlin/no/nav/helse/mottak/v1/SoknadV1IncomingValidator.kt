@@ -14,16 +14,6 @@ internal fun SoknadV1Incoming.validate() {
         )
     }
 
-    if (søkerFødselsnummer.length != 11 || !søkerFødselsnummer.erKunSiffer()) {
-        violations.add(
-            Violation(
-                parameterName = "søker.fødselsnummer",
-                parameterType = ParameterType.ENTITY,
-                reason = "Ikke gyldig fødselsnummer.",
-                invalidValue = søkerFødselsnummer
-            )
-        )
-    }
     if (!søkerAktørId.id.erKunSiffer()) {
         violations.add(
             Violation(

@@ -22,7 +22,7 @@ internal class SoknadV1MottakService(
         soknadId: SoknadId,
         metadata: Metadata,
         soknad: SoknadV1Incoming
-    ) : SoknadId {
+    ): SoknadId {
         val correlationId = CorrelationId(metadata.correlationId)
 
         logger.trace("Lagrer legeerklæringer")
@@ -32,12 +32,17 @@ internal class SoknadV1MottakService(
             correlationId = correlationId
         )
 
-        logger.trace("Lagrer samværsvtaler")
-        val samværsavtaleUrls = lagreVedleg(
-            aktoerId = soknad.søkerAktørId,
-            vedlegg = soknad.samværsavtale,
-            correlationId = correlationId
-        )
+        val samværsavtaleUrls = when (soknad.samværsavtale.isEmpty()) {
+            soknad.samværsavtale.isNotEmpty() -> {
+                logger.trace("Lagrer samværsvtaler")
+                lagreVedleg(
+                    aktoerId = soknad.søkerAktørId,
+                    vedlegg = soknad.samværsavtale,
+                    correlationId = correlationId
+                )
+            }
+            else -> listOf()
+        }
 
         val outgoing = soknad
             .medLegeerklæringUrls(legeerklæringUrls)
@@ -58,7 +63,7 @@ internal class SoknadV1MottakService(
         aktoerId: AktoerId,
         correlationId: CorrelationId,
         vedlegg: List<Vedlegg>
-    ) : List<URI> {
+    ): List<URI> {
         logger.info("Lagrer ${vedlegg.size} vedlegg.")
         return dokumentGateway.lagreDokmenter(
             dokumenter = vedlegg.somDokumenter(),

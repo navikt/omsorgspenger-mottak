@@ -20,7 +20,6 @@ private object JsonKeys {
 
 internal class SoknadV1Incoming(json: String) {
     private val jsonObject = JSONObject(json)
-    internal val søkerFødselsnummer: String
     internal val legeerklæring: List<Vedlegg>
     internal val samværsavtale: List<Vedlegg>
 
@@ -44,7 +43,6 @@ internal class SoknadV1Incoming(json: String) {
     }
 
     init {
-        søkerFødselsnummer = jsonObject.getJSONObject(JsonKeys.søker).getString(JsonKeys.fødselsnummer)
         legeerklæring = hentLegeerklæring()
         samværsavtale = hentSamværsavtale()
         jsonObject.remove(JsonKeys.legeerklæring)
@@ -74,7 +72,6 @@ internal class SoknadV1Incoming(json: String) {
 
 internal class SoknadV1Outgoing(internal val jsonObject: JSONObject) {
     internal val soknadId = SoknadId(jsonObject.getString(JsonKeys.søknadId))
-    // TODO: Refaktorer slik at dette støtte både legeerklaring vedlegg og samversavtale vedlegg.
     internal val legeerklæringUrls = hentVedleggUrls(JsonKeys.legeerklæring)
     internal val samværrsavtaleUrls = hentVedleggUrls(JsonKeys.samværsavtale)
 
