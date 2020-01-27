@@ -215,7 +215,6 @@ class OmsorgspengerMottakTest {
 
     @Test
     fun `En ugyldig melding gir valideringsfeil`() {
-        val ugyldigFnr = "290990123451"
         val soknad = """
         {
             "søker": {
