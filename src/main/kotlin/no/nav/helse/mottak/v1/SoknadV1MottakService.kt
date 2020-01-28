@@ -25,16 +25,16 @@ internal class SoknadV1MottakService(
     ): SoknadId {
         val correlationId = CorrelationId(metadata.correlationId)
 
-        logger.trace("Lagrer legeerklæringer")
+        logger.info("Lagrer legeerklæringer")
         val legeerklæringUrls = lagreVedleg(
             aktoerId = soknad.søkerAktørId,
             vedlegg = soknad.legeerklæring,
             correlationId = correlationId
         )
 
-        val samværsavtaleUrls = when (soknad.samværsavtale.isEmpty()) {
+        val samværsavtaleUrls = when {
             soknad.samværsavtale.isNotEmpty() -> {
-                logger.trace("Lagrer samværsvtaler")
+                logger.info("Lagrer samværsvtaler")
                 lagreVedleg(
                     aktoerId = soknad.søkerAktørId,
                     vedlegg = soknad.samværsavtale,
@@ -50,7 +50,7 @@ internal class SoknadV1MottakService(
             .medSoknadId(soknadId)
             .somOutgoing()
 
-        logger.trace("Legger på kø")
+        logger.info("Legger på kø")
         soknadV1KafkaProducer.produce(
             metadata = metadata,
             soknad = outgoing
