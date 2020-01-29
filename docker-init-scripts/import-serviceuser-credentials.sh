@@ -2,10 +2,10 @@
 
 echo "Importing Serviceuser credentials"
 
-if test -d docker-init-scripts/serviceuser
+if test -d /var/run/secrets/nais.io/serviceuser
 then
   echo "found files..."
-    for FILE in docker-init-scripts/serviceuser/*
+    for FILE in /var/run/secrets/nais.io/serviceuser/*
     do
         FILE_NAME=$(echo $FILE | sed 's:.*/::')
         KEY=NAIS_$FILE_NAME
