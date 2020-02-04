@@ -1,5 +1,5 @@
 # omsorgspenger-mottak
-
+![CI / CD](https://github.com/navikt/omsorgspenger-mottak/workflows/CI%20/%20CD/badge.svg)
 
 Tjeneste som tar imot søknader om omsorgspenger og legger de til til prosessering.
 Mottar søknad som REST API-kall. Legges videre på en Kafka Topic som tjenesten [omsorgspenger-prosessering](https://github.com/navikt/omsorgspenger-prosessering) prosesserer.
