@@ -22,23 +22,35 @@ internal class SoknadV1MottakService(
         soknadId: SoknadId,
         metadata: Metadata,
         soknad: SoknadV1Incoming
-    ) : SoknadId {
+    ): SoknadId {
         val correlationId = CorrelationId(metadata.correlationId)
 
-        logger.trace("Lagrer vedlegg")
-        // TODO: Refaktorer slik at dette støtte både legeerklaring vedlegg og samversavtale vedlegg.
-        val vedleggUrls = lagreVedleg(
-            aktoerId = soknad.sokerAktoerId,
-            vedlegg = soknad.vedlegg,
+        logger.info("Lagrer legeerklæringer")
+        val legeerklæringUrls = lagreVedleg(
+            aktoerId = soknad.søkerAktørId,
+            vedlegg = soknad.legeerklæring,
             correlationId = correlationId
         )
 
+        val samværsavtaleUrls = when {
+            soknad.samværsavtale.isNotEmpty() -> {
+                logger.info("Lagrer samværsvtaler")
+                lagreVedleg(
+                    aktoerId = soknad.søkerAktørId,
+                    vedlegg = soknad.samværsavtale,
+                    correlationId = correlationId
+                )
+            }
+            else -> listOf()
+        }
+
         val outgoing = soknad
-            .medVedleggUrls(vedleggUrls)
+            .medLegeerklæringUrls(legeerklæringUrls)
+            .medSamværsavtaleUrls(samværsavtaleUrls)
             .medSoknadId(soknadId)
             .somOutgoing()
 
-        logger.trace("Legger på kø")
+        logger.info("Legger på kø")
         soknadV1KafkaProducer.produce(
             metadata = metadata,
             soknad = outgoing
@@ -51,7 +63,7 @@ internal class SoknadV1MottakService(
         aktoerId: AktoerId,
         correlationId: CorrelationId,
         vedlegg: List<Vedlegg>
-    ) : List<URI> {
+    ): List<URI> {
         logger.info("Lagrer ${vedlegg.size} vedlegg.")
         return dokumentGateway.lagreDokmenter(
             dokumenter = vedlegg.somDokumenter(),
