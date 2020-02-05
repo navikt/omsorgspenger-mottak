@@ -319,12 +319,12 @@ class OmsorgspengerMottakTest {
             },
             legeerklæring: [{
                 "content": "${Base64.encodeBase64String("iPhone_6.jpg".fromResources().readBytes())}",
-                "content_type": "image/jpeg",
+                "contentType": "image/jpeg",
                 "title": "Et fint bilde"
             }],
             samværsavtale: [{
                 "content": "${Base64.encodeBase64String("iPhone_6.jpg".fromResources().readBytes())}",
-                "content_type": "image/jpeg",
+                "contentType": "image/jpeg",
                 "title": "Et fint bilde"
             }],
             "hvilke_som_helst_andre_atributter": {

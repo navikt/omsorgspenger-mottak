@@ -14,7 +14,7 @@ private object JsonKeys {
     internal const val søknadId = "søknadId"
     internal const val fødselsnummer = "fødselsnummer"
     internal const val content = "content"
-    internal const val contentType = "content_type"
+    internal const val contentType = "contentType"
     internal const val title = "title"
 }
 
