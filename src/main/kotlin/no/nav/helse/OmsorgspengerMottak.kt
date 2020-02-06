@@ -1,5 +1,6 @@
 package no.nav.helse
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import io.ktor.application.*
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -40,7 +41,7 @@ private val logger: Logger = LoggerFactory.getLogger("no.nav.OmsorgspengerMottak
 private const val soknadIdKey = "soknad_id"
 private val soknadIdAttributeKey = AttributeKey<String>(soknadIdKey)
 
-fun main(args: Array<String>): Unit  = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 @KtorExperimentalAPI
 fun Application.omsorgspengerMottak() {
@@ -59,6 +60,7 @@ fun Application.omsorgspengerMottak() {
     install(ContentNegotiation) {
         jackson {
             dusseldorfConfigured()
+                .setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE)
         }
     }
 
@@ -110,9 +112,15 @@ fun Application.omsorgspengerMottak() {
                 healthChecks = setOf(
                     soknadV1KafkaProducer,
                     dokumentGateway,
-                    HttpRequestHealthCheck(issuers.healthCheckMap(mutableMapOf(
-                        Url.healthURL(configuration.getK9DokumentBaseUrl()) to HttpRequestHealthConfig(expectedStatus = HttpStatusCode.OK)
-                    )))
+                    HttpRequestHealthCheck(
+                        issuers.healthCheckMap(
+                            mutableMapOf(
+                                Url.healthURL(configuration.getK9DokumentBaseUrl()) to HttpRequestHealthConfig(
+                                    expectedStatus = HttpStatusCode.OK
+                                )
+                            )
+                        )
+                    )
                 )
             )
         )
@@ -132,18 +140,21 @@ fun Application.omsorgspengerMottak() {
 }
 
 private fun Map<Issuer, Set<ClaimRule>>.healthCheckMap(
-    initial : MutableMap<URI, HttpRequestHealthConfig> = mutableMapOf()
-) : Map<URI, HttpRequestHealthConfig> {
+    initial: MutableMap<URI, HttpRequestHealthConfig> = mutableMapOf()
+): Map<URI, HttpRequestHealthConfig> {
     forEach { issuer, _ ->
-        initial[issuer.jwksUri()] = HttpRequestHealthConfig(expectedStatus = HttpStatusCode.OK, includeExpectedStatusEntity = false)
+        initial[issuer.jwksUri()] =
+            HttpRequestHealthConfig(expectedStatus = HttpStatusCode.OK, includeExpectedStatusEntity = false)
     }
     return initial.toMap()
 }
+
 private fun Url.Companion.healthURL(baseUrl: URI) = Url.buildURL(baseUrl = baseUrl, pathParts = listOf("health"))
 
-private fun ApplicationCall.setSoknadItAsAttributeAndGet() : String {
+private fun ApplicationCall.setSoknadItAsAttributeAndGet(): String {
     val soknadId = UUID.randomUUID().toString()
     attributes.put(soknadIdAttributeKey, soknadId)
     return soknadId
 }
+
 internal fun ApplicationCall.getSoknadId() = SoknadId(attributes[soknadIdAttributeKey])
