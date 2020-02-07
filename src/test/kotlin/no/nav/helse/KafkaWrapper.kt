@@ -82,8 +82,8 @@ private class SoknadV1OutgoingDeserialiser : Deserializer<TopicEntry<JSONObject>
         return TopicEntry(
             metadata = Metadata(
                 version = metadata.getInt("version"),
-                correlationId = metadata.getString("correlation_id"),
-                requestId = metadata.getString("request_id")
+                correlationId = metadata.getString("correlationId"),
+                requestId = metadata.getString("requestId")
             ),
             data = json.getJSONObject("data")
         )

@@ -71,8 +71,8 @@ internal class SoknadV1KafkaProducer(
 private class SoknadV1OutgoingSerialier : Serializer<TopicEntry<JSONObject>> {
     override fun serialize(topic: String, data: TopicEntry<JSONObject>) : ByteArray {
         val metadata = JSONObject()
-            .put("correlation_id", data.metadata.correlationId)
-            .put("request_id", data.metadata.requestId)
+            .put("correlationId", data.metadata.correlationId)
+            .put("requestId", data.metadata.requestId)
             .put("version", data.metadata.version)
 
         return JSONObject()
