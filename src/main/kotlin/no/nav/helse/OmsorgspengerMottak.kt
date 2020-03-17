@@ -32,6 +32,8 @@ import no.nav.helse.dusseldorf.ktor.metrics.init
 import no.nav.helse.mottak.v1.SoknadV1Api
 import no.nav.helse.mottak.v1.SoknadV1KafkaProducer
 import no.nav.helse.mottak.v1.SoknadV1MottakService
+import no.nav.helse.mottakOverføreDager.SoknadOverforeDagerKafkaProducer
+import no.nav.helse.mottakOverføreDager.SoknadOverforeDagerMottakService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -94,6 +96,10 @@ fun Application.omsorgspengerMottak() {
         kafkaConfig = configuration.getKafkaConfig()
     )
 
+    val soknadOverforeDagerKafkaProducer = SoknadOverforeDagerKafkaProducer(
+        kafkaConfig = configuration.getKafkaConfig()
+    )
+
     environment.monitor.subscribe(ApplicationStopping) {
         logger.info("Stopper Kafka Producer.")
         soknadV1KafkaProducer.stop()
@@ -132,6 +138,9 @@ fun Application.omsorgspengerMottak() {
                     soknadV1MottakService = SoknadV1MottakService(
                         dokumentGateway = dokumentGateway,
                         soknadV1KafkaProducer = soknadV1KafkaProducer
+                    ),
+                    soknadOverforeDagerMottakService = SoknadOverforeDagerMottakService(
+                        soknadOverforeDagerKafkaProducer = soknadOverforeDagerKafkaProducer
                     )
                 )
             }
