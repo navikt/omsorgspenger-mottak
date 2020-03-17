@@ -3,6 +3,7 @@ import no.nav.helse.mottak.v1.SoknadV1Incoming
 
 internal fun SoknadV1Incoming.validate() {
     val violations = mutableSetOf<Violation>()
+/*
     if (legeerklæring.isEmpty()) {
         violations.add(
             Violation(
@@ -13,7 +14,7 @@ internal fun SoknadV1Incoming.validate() {
             )
         )
     }
-
+*/
     if (!søkerAktørId.id.erKunSiffer()) {
         violations.add(
             Violation(
