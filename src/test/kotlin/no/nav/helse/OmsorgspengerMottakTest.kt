@@ -430,7 +430,6 @@ class OmsorgspengerMottakTest {
                   "harSamfunnskritiskJobb": true
                 }
             }
-        }
         """.trimIndent()
 
     private fun hentSoknadSendtTilProsessering(soknadId: String?) : JSONObject {
