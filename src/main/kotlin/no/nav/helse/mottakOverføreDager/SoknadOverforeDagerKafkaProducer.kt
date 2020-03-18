@@ -22,7 +22,7 @@ internal class SoknadOverforeDagerKafkaProducer(
     private companion object {
         private val NAME = "SoknadOverforeDagerProducer"
         private val TOPIC_USE = TopicUse(
-            name = Topics.MOTTATT,
+            name = Topics.MOTTATT_OVERFORE_DAGER,
             valueSerializer = SoknadV1OutgoingSerialier()
         )
         private val logger = LoggerFactory.getLogger(SoknadOverforeDagerKafkaProducer::class.java)

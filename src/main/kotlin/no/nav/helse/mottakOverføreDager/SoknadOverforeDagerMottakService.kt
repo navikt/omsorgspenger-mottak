@@ -22,7 +22,7 @@ internal class SoknadOverforeDagerMottakService(
 
         val outgoing = soknad.medSoknadId(soknadId).somOutgoing()
 
-        logger.info("Legger på kø")
+        logger.info("Legger søknad for overføring av dager på kø")
         soknadOverforeDagerKafkaProducer.produce(
             metadata = metadata,
             soknad = outgoing
