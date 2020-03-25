@@ -25,7 +25,8 @@ object KafkaWrapper {
             withSchemaRegistry = false,
             withSecurity = true,
             topicNames= listOf(
-                Topics.MOTTATT
+                Topics.MOTTATT,
+                Topics.MOTTATT_OVERFORE_DAGER
             )
         )
         return kafkaEnvironment
@@ -48,19 +49,20 @@ internal fun KafkaEnvironment.testConsumer() : KafkaConsumer<String, TopicEntry<
         StringDeserializer(),
         SoknadV1OutgoingDeserialiser()
     )
-    consumer.subscribe(listOf(Topics.MOTTATT))
+    consumer.subscribe(listOf(Topics.MOTTATT, Topics.MOTTATT_OVERFORE_DAGER))
     return consumer
 }
 
 internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentSoknad(
     soknadId: String,
-    maxWaitInSeconds: Long = 20
+    maxWaitInSeconds: Long = 20,
+    topic: String
 ) : TopicEntry<JSONObject> {
     val end = System.currentTimeMillis() + Duration.ofSeconds(maxWaitInSeconds).toMillis()
     while (System.currentTimeMillis() < end) {
         seekToBeginning(assignment())
         val entries = poll(Duration.ofSeconds(1))
-            .records(Topics.MOTTATT)
+            .records(topic)
             .filter { it.key().equals(soknadId) }
 
         if (entries.isNotEmpty()) {
