@@ -1,4 +1,4 @@
-package no.nav.helse.mottakOverføreDager
+package no.nav.helse.mottakOverføreDager.v1
 
 import kotlinx.io.core.toByteArray
 import no.nav.helse.Metadata

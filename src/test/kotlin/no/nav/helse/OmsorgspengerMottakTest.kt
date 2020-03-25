@@ -20,8 +20,8 @@ import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.kafka.Topics
 import no.nav.helse.mottak.v1.*
-import no.nav.helse.mottakOverføreDager.SoknadOverforeDagerIncoming
-import no.nav.helse.mottakOverføreDager.SoknadOverforeDagerOutgoing
+import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerIncoming
+import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerOutgoing
 import org.apache.commons.codec.binary.Base64
 import org.json.JSONObject
 import org.junit.AfterClass
@@ -412,9 +412,12 @@ class OmsorgspengerMottakTest {
         incomingJsonString: String,
         outgoingJsonObject: JSONObject
     ) {
-        val outgoing = SoknadOverforeDagerOutgoing(outgoingJsonObject)
+        val outgoing =
+            SoknadOverforeDagerOutgoing(outgoingJsonObject)
 
-        val outgoingFromIncoming = SoknadOverforeDagerIncoming(incomingJsonString)
+        val outgoingFromIncoming = SoknadOverforeDagerIncoming(
+            incomingJsonString
+        )
             .medSoknadId(outgoing.soknadId)
             .somOutgoing()
 

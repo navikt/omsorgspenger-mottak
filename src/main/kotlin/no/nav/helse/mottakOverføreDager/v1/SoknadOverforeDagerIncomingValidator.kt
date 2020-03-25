@@ -1,4 +1,4 @@
-package no.nav.helse.mottakOverføreDager
+package no.nav.helse.mottakOverføreDager.v1
 
 import no.nav.helse.dusseldorf.ktor.core.*
 

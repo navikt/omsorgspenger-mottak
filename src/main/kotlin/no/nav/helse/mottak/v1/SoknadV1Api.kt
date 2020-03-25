@@ -13,10 +13,12 @@ import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
 import no.nav.helse.Metadata
+import no.nav.helse.ettersending.v1.SoknadEttersendingV1Incoming
+import no.nav.helse.ettersending.v1.SoknadEttersendingV1MottakService
 import no.nav.helse.getSoknadId
-import no.nav.helse.mottakOverføreDager.SoknadOverforeDagerIncoming
-import no.nav.helse.mottakOverføreDager.SoknadOverforeDagerMottakService
-import no.nav.helse.mottakOverføreDager.validate
+import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerIncoming
+import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerMottakService
+import no.nav.helse.mottakOverføreDager.v1.validate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import validate
@@ -25,7 +27,8 @@ private val logger: Logger = LoggerFactory.getLogger("no.nav.SoknadV1Api")
 
 internal fun Route.SoknadV1Api(
     soknadV1MottakService: SoknadV1MottakService,
-    soknadOverforeDagerMottakService: SoknadOverforeDagerMottakService
+    soknadOverforeDagerMottakService: SoknadOverforeDagerMottakService,
+    soknadEttersendingV1MottakService: SoknadEttersendingV1MottakService
 ) {
     post("v1/soknad") {
         val soknadId = call.getSoknadId()
@@ -51,6 +54,19 @@ internal fun Route.SoknadV1Api(
         )
         call.respond(HttpStatusCode.Accepted, mapOf("id" to soknadId.id))
     }
+
+    post("v1/soknad/ettersend") {
+        val soknadId = call.getSoknadId()
+        val metadata = call.metadata()
+        val soknad = call.soknadEttersending()
+
+        soknadEttersendingV1MottakService.leggTilProsessering(
+            soknadId = soknadId,
+            metadata = metadata,
+            soknad = soknad
+        )
+        call.respond(HttpStatusCode.Accepted, mapOf("id" to soknadId.id))
+    }
 }
 
 private suspend fun ApplicationCall.soknad() : SoknadV1Incoming {
@@ -63,6 +79,13 @@ private suspend fun ApplicationCall.soknad() : SoknadV1Incoming {
 private suspend fun ApplicationCall.soknadOverforeDager() : SoknadOverforeDagerIncoming {
     val json = receiveStream().use { String(it.readAllBytes(), Charsets.UTF_8) }
     val incoming = SoknadOverforeDagerIncoming(json)
+    incoming.validate()
+    return incoming
+}
+
+private suspend fun ApplicationCall.soknadEttersending() : SoknadEttersendingV1Incoming {
+    val json = receiveStream().use { String(it.readAllBytes(), Charsets.UTF_8) }
+    val incoming = SoknadEttersendingV1Incoming(json)
     incoming.validate()
     return incoming
 }
