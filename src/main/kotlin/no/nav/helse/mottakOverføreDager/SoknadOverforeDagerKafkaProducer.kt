@@ -38,7 +38,7 @@ internal class SoknadOverforeDagerKafkaProducer(
         soknad: SoknadOverforeDagerOutgoing,
         metadata: Metadata
     ) {
-        if (metadata.version != 1) throw IllegalStateException("Kan ikke legge søknad på versjon ${metadata.version} til prosessering.")
+        if (metadata.version != 1) throw IllegalStateException("Kan ikke legge søknad om overføring av omsorgsdager på versjon ${metadata.version} til prosessering.")
 
         val recordMetaData = producer.send(
             ProducerRecord(
@@ -51,7 +51,7 @@ internal class SoknadOverforeDagerKafkaProducer(
             )
         ).get()
 
-        logger.info("Søknad sendt til Topic '${TOPIC_USE.name}' med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'")
+        logger.info("Søknad om overføring av omsorgsdager sendt til Topic '${TOPIC_USE.name}' med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'")
     }
 
 
