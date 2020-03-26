@@ -151,7 +151,7 @@ fun Application.omsorgspengerMottak() {
                     ),
                     soknadEttersendingV1MottakService = SoknadEttersendingV1MottakService(
                         dokumentGateway = dokumentGateway,
-                        soknadEttersendingV1KafkaProducer = soknadEttersendingV1KafkaProducer //TODO soknadV1ettersending kafka, lage egen
+                        soknadEttersendingV1KafkaProducer = soknadEttersendingV1KafkaProducer
                     )
                 )
             }

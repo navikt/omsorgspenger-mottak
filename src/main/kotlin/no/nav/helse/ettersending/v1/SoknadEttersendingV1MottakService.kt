@@ -6,10 +6,8 @@ import no.nav.helse.Metadata
 import no.nav.helse.SoknadId
 import no.nav.helse.dokument.Dokument
 import no.nav.helse.dokument.DokumentGateway
-import no.nav.helse.mottak.v1.SoknadV1KafkaProducer
 import org.slf4j.LoggerFactory
 import java.net.URI
-
 
 internal class SoknadEttersendingV1MottakService(
     private val dokumentGateway: DokumentGateway,
