@@ -377,11 +377,6 @@ class OmsorgspengerMottakTest {
                     "instance": "about:blank",
                     "invalid_parameters": [{
                         "type": "entity",
-                        "name": "legeerklæring",
-                        "reason": "Det må sendes minst en legeerklæringsfil.",
-                        "invalid_value": []
-                    }, {
-                        "type": "entity",
                         "name": "søker.aktørId",
                         "reason": "Ikke gyldig Aktør ID.",
                         "invalid_value": "ABC"
