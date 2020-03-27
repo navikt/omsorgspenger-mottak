@@ -1,5 +1,5 @@
 import no.nav.helse.dusseldorf.ktor.core.*
-import no.nav.helse.ettersending.v1.SoknadEttersendingV1Incoming
+import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1Incoming
 
 internal fun SoknadEttersendingV1Incoming.validate() {
     val violations = mutableSetOf<Violation>()

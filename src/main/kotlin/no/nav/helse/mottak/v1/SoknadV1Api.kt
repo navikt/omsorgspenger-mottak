@@ -13,8 +13,8 @@ import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
 import no.nav.helse.Metadata
-import no.nav.helse.ettersending.v1.SoknadEttersendingV1Incoming
-import no.nav.helse.ettersending.v1.SoknadEttersendingV1MottakService
+import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1Incoming
+import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1MottakService
 import no.nav.helse.getSoknadId
 import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerIncoming
 import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerMottakService
@@ -55,7 +55,7 @@ internal fun Route.SoknadV1Api(
         call.respond(HttpStatusCode.Accepted, mapOf("id" to soknadId.id))
     }
 
-    post("v1/soknad/ettersend") {
+    post("v1/ettersend") {
         val soknadId = call.getSoknadId()
         val metadata = call.metadata()
         val soknad = call.soknadEttersending()

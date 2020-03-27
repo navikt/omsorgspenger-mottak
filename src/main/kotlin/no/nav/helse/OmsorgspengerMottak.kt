@@ -29,8 +29,8 @@ import no.nav.helse.dusseldorf.ktor.jackson.JacksonStatusPages
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
 import no.nav.helse.dusseldorf.ktor.metrics.MetricsRoute
 import no.nav.helse.dusseldorf.ktor.metrics.init
-import no.nav.helse.ettersending.v1.SoknadEttersendingV1KafkaProducer
-import no.nav.helse.ettersending.v1.SoknadEttersendingV1MottakService
+import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1KafkaProducer
+import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1MottakService
 import no.nav.helse.mottak.v1.SoknadV1Api
 import no.nav.helse.mottak.v1.SoknadV1KafkaProducer
 import no.nav.helse.mottak.v1.SoknadV1MottakService
@@ -102,9 +102,10 @@ fun Application.omsorgspengerMottak() {
             kafkaConfig = configuration.getKafkaConfig()
     )
 
-    val soknadEttersendingV1KafkaProducer = SoknadEttersendingV1KafkaProducer(
-        kafkaConfig = configuration.getKafkaConfig()
-    )
+    val soknadEttersendingV1KafkaProducer =
+        SoknadEttersendingV1KafkaProducer(
+            kafkaConfig = configuration.getKafkaConfig()
+        )
 
 
     environment.monitor.subscribe(ApplicationStopping) {

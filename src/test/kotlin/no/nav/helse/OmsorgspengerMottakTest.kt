@@ -18,8 +18,8 @@ import no.nav.helse.dusseldorf.ktor.core.fromResources
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
-import no.nav.helse.ettersending.v1.SoknadEttersendingV1Incoming
-import no.nav.helse.ettersending.v1.SoknadEttersendingV1Outgoing
+import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1Incoming
+import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1Outgoing
 import no.nav.helse.kafka.Topics
 import no.nav.helse.mottak.v1.*
 import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerIncoming

@@ -1,4 +1,4 @@
-package no.nav.helse.ettersending.v1
+package no.nav.helse.mottakEttersending.v1
 
 import kotlinx.io.core.toByteArray
 import no.nav.helse.Metadata

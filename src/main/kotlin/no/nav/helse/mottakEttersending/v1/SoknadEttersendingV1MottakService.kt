@@ -1,4 +1,4 @@
-package no.nav.helse.ettersending.v1
+package no.nav.helse.mottakEttersending.v1
 
 import no.nav.helse.AktoerId
 import no.nav.helse.CorrelationId

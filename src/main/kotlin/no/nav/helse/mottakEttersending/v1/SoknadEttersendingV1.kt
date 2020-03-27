@@ -1,4 +1,4 @@
-package no.nav.helse.ettersending.v1
+package no.nav.helse.mottakEttersending.v1
 
 import no.nav.helse.AktoerId
 import no.nav.helse.SoknadId
@@ -11,7 +11,7 @@ private object JsonKeys {
     internal const val aktørId = "aktørId"
     internal const val søknadId = "søknadId"
     internal const val fødselsnummer = "fødselsnummer"
-    internal const val vedleggUrls = "vedlegg_urls"
+    internal const val vedleggUrls = "vedleggUrls"
     internal const val vedlegg = "vedlegg"
     internal const val content = "content"
     internal const val contentType = "contentType"
@@ -57,7 +57,8 @@ internal class SoknadEttersendingV1Incoming(json: String) {
         return this
     }
 
-    internal fun somOutgoing() = SoknadEttersendingV1Outgoing(jsonObject)
+    internal fun somOutgoing() =
+        SoknadEttersendingV1Outgoing(jsonObject)
 
 }
 
