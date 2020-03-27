@@ -138,7 +138,7 @@ class OmsorgspengerMottakTest {
             expectedCode = HttpStatusCode.Accepted,
             expectedResponse = null,
             accessToken = accessToken,
-            path = "/v1/soknad/ettersend"
+            path = "/v1/ettersend"
         )
 
         val sendtTilProsessering = hentSoknadEttersendingSendtTilProsessering(soknadId)
@@ -158,7 +158,7 @@ class OmsorgspengerMottakTest {
             soknad = soknad,
             expectedCode = HttpStatusCode.Accepted,
             expectedResponse = null,
-            path = "/v1/soknad/ettersend"
+            path = "/v1/ettersend"
         )
 
         val sendtTilProsessering  = hentSoknadEttersendingSendtTilProsessering(soknadId)
@@ -187,7 +187,7 @@ class OmsorgspengerMottakTest {
             }
             """.trimIndent(),
             accessToken = unAauthorizedAccessToken,
-            path = "/v1/soknad/ettersend"
+            path = "/v1/ettersend"
         )
     }
 
@@ -218,7 +218,7 @@ class OmsorgspengerMottakTest {
                 }
             """.trimIndent(),
             leggTilCorrelationId = false,
-            path = "/v1/soknad/ettersend"
+            path = "/v1/ettersend"
         )
     }
 
@@ -262,7 +262,7 @@ class OmsorgspengerMottakTest {
               ]
             }
             """.trimIndent(),
-            path = "/v1/soknad/ettersend"
+            path = "/v1/ettersend"
         )
     }
 
