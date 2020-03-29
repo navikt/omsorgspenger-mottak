@@ -18,8 +18,8 @@ import no.nav.helse.dusseldorf.ktor.core.fromResources
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
-import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1Incoming
-import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1Outgoing
+import no.nav.helse.mottakEttersending.v1.EttersendingV1Incoming
+import no.nav.helse.mottakEttersending.v1.EttersendingV1Outgoing
 import no.nav.helse.kafka.Topics
 import no.nav.helse.mottak.v1.*
 import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerIncoming
@@ -123,13 +123,13 @@ class OmsorgspengerMottakTest {
     }
 
     @Test
-    fun `Gyldig sending for ettersending blir lagt til prosessering`(){
-        gyldigSoknadEttersendingBlirLagtTilProsessering(Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
-        gyldigSoknadEttersendingBlirLagtTilProsessering(Azure.V2_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
+    fun `Gyldig ettersending blir lagt til prosessering`(){
+        gyldigEttersendingBlirLagtTilProsessering(Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
+        gyldigEttersendingBlirLagtTilProsessering(Azure.V2_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
     }
 
-    private fun gyldigSoknadEttersendingBlirLagtTilProsessering(accessToken: String) {
-        val soknad = gyldigSoknadEttersending(
+    private fun gyldigEttersendingBlirLagtTilProsessering(accessToken: String) {
+        val soknad = gyldigEttersending(
             fodselsnummerSoker = gyldigFodselsnummerA
         )
 
@@ -141,8 +141,8 @@ class OmsorgspengerMottakTest {
             path = "/v1/ettersend"
         )
 
-        val sendtTilProsessering = hentSoknadEttersendingSendtTilProsessering(soknadId)
-        verifiserSoknadEttersendingLagtTilProsessering(
+        val sendtTilProsessering = hentEttersendingSendtTilProsessering(soknadId)
+        verifiserEttersendingLagtTilProsessering(
             incomingJsonString = soknad,
             outgoingJsonObject = sendtTilProsessering
         )
@@ -150,7 +150,7 @@ class OmsorgspengerMottakTest {
 
     @Test
     fun `Gyldig søknad for ettersendig fra D-nummer blir lagt til prosessering`() {
-        val soknad = gyldigSoknadEttersending(
+        val soknad = gyldigEttersending(
             fodselsnummerSoker = dNummerA
         )
 
@@ -161,8 +161,8 @@ class OmsorgspengerMottakTest {
             path = "/v1/ettersend"
         )
 
-        val sendtTilProsessering  = hentSoknadEttersendingSendtTilProsessering(soknadId)
-        verifiserSoknadEttersendingLagtTilProsessering(
+        val sendtTilProsessering  = hentEttersendingSendtTilProsessering(soknadId)
+        verifiserEttersendingLagtTilProsessering(
             incomingJsonString = soknad,
             outgoingJsonObject = sendtTilProsessering
         )
@@ -170,7 +170,7 @@ class OmsorgspengerMottakTest {
 
     @Test
     fun `Request fra ikke autorisert system feiler, søknad for ettersendig`() {
-        val soknad = gyldigSoknadEttersending(
+        val soknad = gyldigEttersending(
             fodselsnummerSoker = gyldigFodselsnummerA
         )
 
@@ -193,7 +193,7 @@ class OmsorgspengerMottakTest {
 
     @Test
     fun `Request uten corelation id feiler, søknad for ettersending`() {
-        val soknad = gyldigSoknadEttersending(
+        val soknad = gyldigEttersending(
             fodselsnummerSoker = gyldigFodselsnummerA
         )
 
@@ -565,14 +565,14 @@ class OmsorgspengerMottakTest {
         JSONAssert.assertEquals(outgoingFromIncoming.jsonObject.toString(), outgoing.jsonObject.toString(), true)
     }
 
-    private fun verifiserSoknadEttersendingLagtTilProsessering(
+    private fun verifiserEttersendingLagtTilProsessering(
         incomingJsonString: String,
         outgoingJsonObject: JSONObject
     ) {
         val outgoing =
-            SoknadEttersendingV1Outgoing(outgoingJsonObject)
+            EttersendingV1Outgoing(outgoingJsonObject)
 
-        val outgoingFromIncoming = SoknadEttersendingV1Incoming(
+        val outgoingFromIncoming = EttersendingV1Incoming(
             incomingJsonString
         )
             .medSoknadId(outgoing.soknadId)
@@ -677,7 +677,7 @@ class OmsorgspengerMottakTest {
             }
         """.trimIndent()
 
-    private fun gyldigSoknadEttersending(
+    private fun gyldigEttersending(
         fodselsnummerSoker: String
     ) : String = """
         {
@@ -713,7 +713,7 @@ class OmsorgspengerMottakTest {
         return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT_OVERFORE_DAGER).data
     }
 
-    private fun hentSoknadEttersendingSendtTilProsessering(soknadId: String?) : JSONObject {
+    private fun hentEttersendingSendtTilProsessering(soknadId: String?) : JSONObject {
         assertNotNull(soknadId)
         return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT_ETTERSEND).data
     }

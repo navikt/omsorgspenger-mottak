@@ -1,7 +1,7 @@
 import no.nav.helse.dusseldorf.ktor.core.*
-import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1Incoming
+import no.nav.helse.mottakEttersending.v1.EttersendingV1Incoming
 
-internal fun SoknadEttersendingV1Incoming.validate() {
+internal fun EttersendingV1Incoming.validate() {
     val violations = mutableSetOf<Violation>()
     if (vedlegg.isEmpty()) {
         violations.add(

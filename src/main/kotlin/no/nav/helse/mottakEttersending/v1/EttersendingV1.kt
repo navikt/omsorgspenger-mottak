@@ -18,7 +18,7 @@ private object JsonKeys {
     internal const val title = "title"
 }
 
-internal class SoknadEttersendingV1Incoming(json: String) {
+internal class EttersendingV1Incoming(json: String) {
     private val jsonObject = JSONObject(json)
     internal val vedlegg: List<Vedlegg>
 
@@ -47,22 +47,22 @@ internal class SoknadEttersendingV1Incoming(json: String) {
     ))
 
 
-    internal fun medSoknadId(soknadId: SoknadId): SoknadEttersendingV1Incoming {
+    internal fun medSoknadId(soknadId: SoknadId): EttersendingV1Incoming {
         jsonObject.put(JsonKeys.søknadId, soknadId.id)
         return this
     }
 
-    internal fun medVedleggUrls(vedleggUrls: List<URI>) : SoknadEttersendingV1Incoming {
+    internal fun medVedleggUrls(vedleggUrls: List<URI>) : EttersendingV1Incoming {
         jsonObject.put(JsonKeys.vedleggUrls, vedleggUrls)
         return this
     }
 
     internal fun somOutgoing() =
-        SoknadEttersendingV1Outgoing(jsonObject)
+        EttersendingV1Outgoing(jsonObject)
 
 }
 
-internal class SoknadEttersendingV1Outgoing(internal val jsonObject: JSONObject) {
+internal class EttersendingV1Outgoing(internal val jsonObject: JSONObject) {
     internal val soknadId = SoknadId(jsonObject.getString(JsonKeys.søknadId))
     internal val vedleggUrls = hentVedleggUrls()
 

@@ -29,11 +29,11 @@ import no.nav.helse.dusseldorf.ktor.jackson.JacksonStatusPages
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
 import no.nav.helse.dusseldorf.ktor.metrics.MetricsRoute
 import no.nav.helse.dusseldorf.ktor.metrics.init
-import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1KafkaProducer
-import no.nav.helse.mottakEttersending.v1.SoknadEttersendingV1MottakService
 import no.nav.helse.mottak.v1.SoknadV1Api
 import no.nav.helse.mottak.v1.SoknadV1KafkaProducer
 import no.nav.helse.mottak.v1.SoknadV1MottakService
+import no.nav.helse.mottakEttersending.v1.EttersendingV1KafkaProducer
+import no.nav.helse.mottakEttersending.v1.EttersendingV1MottakService
 import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerKafkaProducer
 import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerMottakService
 import org.slf4j.Logger
@@ -102,8 +102,8 @@ fun Application.omsorgspengerMottak() {
             kafkaConfig = configuration.getKafkaConfig()
     )
 
-    val soknadEttersendingV1KafkaProducer =
-        SoknadEttersendingV1KafkaProducer(
+    val ettersendingV1KafkaProducer =
+        EttersendingV1KafkaProducer(
             kafkaConfig = configuration.getKafkaConfig()
         )
 
@@ -111,6 +111,8 @@ fun Application.omsorgspengerMottak() {
     environment.monitor.subscribe(ApplicationStopping) {
         logger.info("Stopper Kafka Producer.")
         soknadV1KafkaProducer.stop()
+        soknadOverforeDagerKafkaProducer.stop()
+        ettersendingV1KafkaProducer.stop()
         logger.info("Kafka Producer Stoppet.")
     }
 
@@ -150,9 +152,9 @@ fun Application.omsorgspengerMottak() {
                     soknadOverforeDagerMottakService = SoknadOverforeDagerMottakService(
                         soknadOverforeDagerKafkaProducer = soknadOverforeDagerKafkaProducer
                     ),
-                    soknadEttersendingV1MottakService = SoknadEttersendingV1MottakService(
+                    ettersendingV1MottakService = EttersendingV1MottakService(
                         dokumentGateway = dokumentGateway,
-                        soknadEttersendingV1KafkaProducer = soknadEttersendingV1KafkaProducer
+                        ettersendingV1KafkaProducer = ettersendingV1KafkaProducer
                     )
                 )
             }

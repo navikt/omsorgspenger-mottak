@@ -9,19 +9,19 @@ import no.nav.helse.dokument.DokumentGateway
 import org.slf4j.LoggerFactory
 import java.net.URI
 
-internal class SoknadEttersendingV1MottakService(
+internal class EttersendingV1MottakService(
     private val dokumentGateway: DokumentGateway,
-    private val soknadEttersendingV1KafkaProducer: SoknadEttersendingV1KafkaProducer
+    private val ettersendingV1KafkaProducer: EttersendingV1KafkaProducer
 ) {
 
     private companion object {
-        private val logger = LoggerFactory.getLogger(SoknadEttersendingV1MottakService::class.java)
+        private val logger = LoggerFactory.getLogger(EttersendingV1MottakService::class.java)
     }
 
     internal suspend fun leggTilProsessering(
         soknadId: SoknadId,
         metadata: Metadata,
-        soknad: SoknadEttersendingV1Incoming
+        soknad: EttersendingV1Incoming
     ) : SoknadId {
         val correlationId = CorrelationId(metadata.correlationId)
 
@@ -37,8 +37,8 @@ internal class SoknadEttersendingV1MottakService(
             .medSoknadId(soknadId)
             .somOutgoing()
 
-        logger.trace("Legger soknad for ettersending på kø")
-        soknadEttersendingV1KafkaProducer.produce(
+        logger.trace("Legger ettersending på kø")
+        ettersendingV1KafkaProducer.produce(
             metadata = metadata,
             soknad = outgoing
         )

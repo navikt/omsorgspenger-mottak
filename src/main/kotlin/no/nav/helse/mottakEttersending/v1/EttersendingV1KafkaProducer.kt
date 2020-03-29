@@ -16,16 +16,16 @@ import org.apache.kafka.common.serialization.Serializer
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
-internal class SoknadEttersendingV1KafkaProducer(
+internal class EttersendingV1KafkaProducer(
     kafkaConfig: KafkaConfig
 ) : HealthCheck {
     private companion object {
-        private val NAME = "SoknadEttersendingV1Producer"
+        private val NAME = "EttersendingV1Producer"
         private val TOPIC_USE = TopicUse(
             name = Topics.MOTTATT_ETTERSEND,
-            valueSerializer = SoknadEttersendingV1OutgoingSerialier()
+            valueSerializer = EttersendingV1OutgoingSerialier()
         )
-        private val logger = LoggerFactory.getLogger(SoknadEttersendingV1KafkaProducer::class.java)
+        private val logger = LoggerFactory.getLogger(EttersendingV1KafkaProducer::class.java)
     }
 
     private val producer = KafkaProducer<String, TopicEntry<JSONObject>>(
@@ -35,10 +35,10 @@ internal class SoknadEttersendingV1KafkaProducer(
     )
 
     internal fun produce(
-        soknad: SoknadEttersendingV1Outgoing,
+        soknad: EttersendingV1Outgoing,
         metadata: Metadata
     ) {
-        if (metadata.version != 1) throw IllegalStateException("Kan ikke legge søknad for ettersending på versjon ${metadata.version} til prosessering.")
+        if (metadata.version != 1) throw IllegalStateException("Kan ikke legge ettersending på versjon ${metadata.version} til prosessering.")
 
         val recordMetaData = producer.send(
             ProducerRecord(
@@ -51,7 +51,7 @@ internal class SoknadEttersendingV1KafkaProducer(
             )
         ).get()
 
-        logger.info("Søknad for ettersending sendt til Topic '${TOPIC_USE.name}' med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'")
+        logger.info("Ettersending sendt til Topic '${TOPIC_USE.name}' med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'")
     }
 
 
@@ -68,7 +68,7 @@ internal class SoknadEttersendingV1KafkaProducer(
     }
 }
 
-private class SoknadEttersendingV1OutgoingSerialier : Serializer<TopicEntry<JSONObject>> {
+private class EttersendingV1OutgoingSerialier : Serializer<TopicEntry<JSONObject>> {
     override fun serialize(topic: String, data: TopicEntry<JSONObject>) : ByteArray {
         val metadata = JSONObject()
             .put("correlationId", data.metadata.correlationId)
