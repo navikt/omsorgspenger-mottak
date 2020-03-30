@@ -16,6 +16,7 @@ private object JsonKeys {
     internal const val content = "content"
     internal const val contentType = "contentType"
     internal const val title = "title"
+    internal const val titler = "titler"
 }
 
 internal class EttersendingV1Incoming(json: String) {
@@ -49,6 +50,15 @@ internal class EttersendingV1Incoming(json: String) {
 
     internal fun medSoknadId(soknadId: SoknadId): EttersendingV1Incoming {
         jsonObject.put(JsonKeys.søknadId, soknadId.id)
+        return this
+    }
+
+    internal fun medVedleggTittel() : EttersendingV1Incoming{
+        val listeOverTitler = mutableListOf<String>()
+        for(vedlegg in vedlegg){
+            listeOverTitler.add(vedlegg.title)
+        }
+        jsonObject.put(JsonKeys.titler, listeOverTitler)
         return this
     }
 

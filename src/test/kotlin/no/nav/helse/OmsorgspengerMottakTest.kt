@@ -575,6 +575,7 @@ class OmsorgspengerMottakTest {
         val outgoingFromIncoming = EttersendingV1Incoming(
             incomingJsonString
         )
+            .medVedleggTittel()
             .medSoknadId(outgoing.soknadId)
             .medVedleggUrls(outgoing.vedleggUrls)
             .somOutgoing()
@@ -689,7 +690,7 @@ class OmsorgspengerMottakTest {
             {
               "content": "http://localhost:8081/vedlegg/1",
               "contentType": "noe",
-              "title": "noe "
+              "title": "tittel-over-vedlegg "
             }
           ],
           "hvilke_som_helst_andre_atributter": {
