@@ -33,7 +33,7 @@ internal class EttersendingV1MottakService(
         )
 
         val outgoing = soknad
-            .medVedleggTittel()
+            .medVedleggTitler()
             .medVedleggUrls(vedleggUrls)
             .medSoknadId(soknadId)
             .somOutgoing()

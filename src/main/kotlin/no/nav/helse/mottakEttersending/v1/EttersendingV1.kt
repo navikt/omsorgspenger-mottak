@@ -53,7 +53,7 @@ internal class EttersendingV1Incoming(json: String) {
         return this
     }
 
-    internal fun medVedleggTittel() : EttersendingV1Incoming{
+    internal fun medVedleggTitler() : EttersendingV1Incoming{
         val listeOverTitler = mutableListOf<String>()
         for(vedlegg in vedlegg){
             listeOverTitler.add(vedlegg.title)

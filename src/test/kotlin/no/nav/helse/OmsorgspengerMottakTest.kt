@@ -575,7 +575,7 @@ class OmsorgspengerMottakTest {
         val outgoingFromIncoming = EttersendingV1Incoming(
             incomingJsonString
         )
-            .medVedleggTittel()
+            .medVedleggTitler()
             .medSoknadId(outgoing.soknadId)
             .medVedleggUrls(outgoing.vedleggUrls)
             .somOutgoing()
