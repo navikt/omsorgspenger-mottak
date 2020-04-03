@@ -69,7 +69,6 @@ internal class EttersendingV1Incoming(json: String) {
 
     internal fun somOutgoing() =
         EttersendingV1Outgoing(jsonObject)
-
 }
 
 internal class EttersendingV1Outgoing(internal val jsonObject: JSONObject) {
