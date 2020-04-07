@@ -1,9 +1,18 @@
-package no.nav.helse.mottakOverføreDager
-
 import no.nav.helse.dusseldorf.ktor.core.*
+import no.nav.helse.mottakEttersending.v1.EttersendingV1Incoming
 
-internal fun SoknadOverforeDagerIncoming.validate() {
+internal fun EttersendingV1Incoming.validate() {
     val violations = mutableSetOf<Violation>()
+    if (vedlegg.isEmpty()) {
+        violations.add(
+            Violation(
+                parameterName = "vedlegg",
+                parameterType = ParameterType.ENTITY,
+                reason = "Det må sendes minst et vedlegg.",
+                invalidValue = vedlegg
+            )
+        )
+    }
 
     if (!søkerAktørId.id.erKunSiffer()) {
         violations.add(

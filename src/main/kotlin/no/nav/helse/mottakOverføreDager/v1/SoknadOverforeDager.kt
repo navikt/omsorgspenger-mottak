@@ -1,4 +1,4 @@
-package no.nav.helse.mottakOverføreDager
+package no.nav.helse.mottakOverføreDager.v1
 
 import no.nav.helse.SoknadId
 import no.nav.helse.AktoerId
@@ -17,14 +17,17 @@ private object JsonKeys {
 internal class SoknadOverforeDagerIncoming(json: String) {
     private val jsonObject = JSONObject(json)
 
-    internal val søkerAktørId = AktoerId(jsonObject.getJSONObject(JsonKeys.søker).getString(JsonKeys.aktørId))
+    internal val søkerAktørId = AktoerId(jsonObject.getJSONObject(JsonKeys.søker).getString(
+        JsonKeys.aktørId
+    ))
 
     internal fun medSoknadId(soknadId: SoknadId): SoknadOverforeDagerIncoming {
         jsonObject.put(JsonKeys.søknadId, soknadId.id)
         return this
     }
 
-    internal fun somOutgoing() = SoknadOverforeDagerOutgoing(jsonObject)
+    internal fun somOutgoing() =
+        SoknadOverforeDagerOutgoing(jsonObject)
 }
 
 internal class SoknadOverforeDagerOutgoing(internal val jsonObject: JSONObject) {

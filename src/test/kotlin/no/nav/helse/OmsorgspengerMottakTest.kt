@@ -18,10 +18,12 @@ import no.nav.helse.dusseldorf.ktor.core.fromResources
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
+import no.nav.helse.mottakEttersending.v1.EttersendingV1Incoming
+import no.nav.helse.mottakEttersending.v1.EttersendingV1Outgoing
 import no.nav.helse.kafka.Topics
 import no.nav.helse.mottak.v1.*
-import no.nav.helse.mottakOverføreDager.SoknadOverforeDagerIncoming
-import no.nav.helse.mottakOverføreDager.SoknadOverforeDagerOutgoing
+import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerIncoming
+import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerOutgoing
 import org.apache.commons.codec.binary.Base64
 import org.json.JSONObject
 import org.junit.AfterClass
@@ -118,6 +120,150 @@ class OmsorgspengerMottakTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun `Gyldig ettersending blir lagt til prosessering`(){
+        gyldigEttersendingBlirLagtTilProsessering(Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
+        gyldigEttersendingBlirLagtTilProsessering(Azure.V2_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
+    }
+
+    private fun gyldigEttersendingBlirLagtTilProsessering(accessToken: String) {
+        val soknad = gyldigEttersending(
+            fodselsnummerSoker = gyldigFodselsnummerA
+        )
+
+        val soknadId = requestAndAssert(
+            soknad = soknad,
+            expectedCode = HttpStatusCode.Accepted,
+            expectedResponse = null,
+            accessToken = accessToken,
+            path = "/v1/ettersend"
+        )
+
+        val sendtTilProsessering = hentEttersendingSendtTilProsessering(soknadId)
+        verifiserEttersendingLagtTilProsessering(
+            incomingJsonString = soknad,
+            outgoingJsonObject = sendtTilProsessering
+        )
+    }
+
+    @Test
+    fun `Gyldig søknad for ettersendig fra D-nummer blir lagt til prosessering`() {
+        val soknad = gyldigEttersending(
+            fodselsnummerSoker = dNummerA
+        )
+
+        val soknadId = requestAndAssert(
+            soknad = soknad,
+            expectedCode = HttpStatusCode.Accepted,
+            expectedResponse = null,
+            path = "/v1/ettersend"
+        )
+
+        val sendtTilProsessering  = hentEttersendingSendtTilProsessering(soknadId)
+        verifiserEttersendingLagtTilProsessering(
+            incomingJsonString = soknad,
+            outgoingJsonObject = sendtTilProsessering
+        )
+    }
+
+    @Test
+    fun `Request fra ikke autorisert system feiler, søknad for ettersendig`() {
+        val soknad = gyldigEttersending(
+            fodselsnummerSoker = gyldigFodselsnummerA
+        )
+
+        requestAndAssert(
+            soknad = soknad,
+            expectedCode = HttpStatusCode.Forbidden,
+            expectedResponse = """
+            {
+                "type": "/problem-details/unauthorized",
+                "title": "unauthorized",
+                "status": 403,
+                "detail": "Requesten inneholder ikke tilstrekkelige tilganger.",
+                "instance": "about:blank"
+            }
+            """.trimIndent(),
+            accessToken = unAauthorizedAccessToken,
+            path = "/v1/ettersend"
+        )
+    }
+
+    @Test
+    fun `Request uten corelation id feiler, søknad for ettersending`() {
+        val soknad = gyldigEttersending(
+            fodselsnummerSoker = gyldigFodselsnummerA
+        )
+
+        requestAndAssert(
+            soknad = soknad,
+            expectedCode = HttpStatusCode.BadRequest,
+            expectedResponse = """
+                {
+                    "type": "/problem-details/invalid-request-parameters",
+                    "title": "invalid-request-parameters",
+                    "detail": "Requesten inneholder ugyldige paramtere.",
+                    "status": 400,
+                    "instance": "about:blank",
+                    "invalid_parameters" : [
+                        {
+                            "name" : "X-Correlation-ID",
+                            "reason" : "Correlation ID må settes.",
+                            "type": "header",
+                            "invalid_value": null
+                        }
+                    ]
+                }
+            """.trimIndent(),
+            leggTilCorrelationId = false,
+            path = "/v1/ettersend"
+        )
+    }
+
+    @Test
+    fun `En ugyldig melding for ettersending gir valideringsfeil`() {
+        val soknad = """
+        {
+            "søker": {
+                "aktørId": "ABC"
+            },
+            "vedlegg": [
+            ]
+        }
+        """.trimIndent()
+
+        requestAndAssert(
+            soknad = soknad,
+            expectedCode = HttpStatusCode.BadRequest,
+            expectedResponse = """
+            {
+              "type": "/problem-details/invalid-request-parameters",
+              "title": "invalid-request-parameters",
+              "status": 400,
+              "detail": "Requesten inneholder ugyldige paramtere.",
+              "instance": "about:blank",
+              "invalid_parameters": [
+                {
+                  "type": "entity",
+                  "name": "vedlegg",
+                  "reason": "Det må sendes minst et vedlegg.",
+                  "invalid_value": [
+                    
+                  ]
+                },
+                {
+                  "type": "entity",
+                  "name": "søker.aktørId",
+                  "reason": "Ikke gyldig Aktør ID.",
+                  "invalid_value": "ABC"
+                }
+              ]
+            }
+            """.trimIndent(),
+            path = "/v1/ettersend"
+        )
     }
 
     @Test
@@ -407,10 +553,31 @@ class OmsorgspengerMottakTest {
         incomingJsonString: String,
         outgoingJsonObject: JSONObject
     ) {
-        val outgoing = SoknadOverforeDagerOutgoing(outgoingJsonObject)
+        val outgoing =
+            SoknadOverforeDagerOutgoing(outgoingJsonObject)
 
-        val outgoingFromIncoming = SoknadOverforeDagerIncoming(incomingJsonString)
+        val outgoingFromIncoming = SoknadOverforeDagerIncoming(
+            incomingJsonString
+        )
             .medSoknadId(outgoing.soknadId)
+            .somOutgoing()
+
+        JSONAssert.assertEquals(outgoingFromIncoming.jsonObject.toString(), outgoing.jsonObject.toString(), true)
+    }
+
+    private fun verifiserEttersendingLagtTilProsessering(
+        incomingJsonString: String,
+        outgoingJsonObject: JSONObject
+    ) {
+        val outgoing =
+            EttersendingV1Outgoing(outgoingJsonObject)
+
+        val outgoingFromIncoming = EttersendingV1Incoming(
+            incomingJsonString
+        )
+            .medVedleggTitler()
+            .medSoknadId(outgoing.soknadId)
+            .medVedleggUrls(outgoing.vedleggUrls)
             .somOutgoing()
 
         JSONAssert.assertEquals(outgoingFromIncoming.jsonObject.toString(), outgoing.jsonObject.toString(), true)
@@ -511,6 +678,32 @@ class OmsorgspengerMottakTest {
             }
         """.trimIndent()
 
+    private fun gyldigEttersending(
+        fodselsnummerSoker: String
+    ) : String = """
+        {
+          "søker": {
+            "fødselsnummer": "$fodselsnummerSoker",
+            "aktørId": "123456"
+          },
+          "vedlegg": [
+            {
+              "content": "http://localhost:8081/vedlegg/1",
+              "contentType": "noe",
+              "title": "tittel-over-vedlegg "
+            }
+          ],
+          "hvilke_som_helst_andre_atributter": {
+            "språk": "nb",
+            "søknadstype": [
+              "ukjent"
+            ],
+            "harForståttRettigheterOgPlikter": true,
+            "harBekreftetOpplysninger": true
+          }
+        }
+    """.trimIndent()
+
     private fun hentSoknadSendtTilProsessering(soknadId: String?) : JSONObject {
         assertNotNull(soknadId)
         return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT).data
@@ -519,6 +712,11 @@ class OmsorgspengerMottakTest {
     private fun hentSoknadOverforeDagerSendtTilProsessering(soknadId: String?) : JSONObject {
         assertNotNull(soknadId)
         return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT_OVERFORE_DAGER).data
+    }
+
+    private fun hentEttersendingSendtTilProsessering(soknadId: String?) : JSONObject {
+        assertNotNull(soknadId)
+        return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT_ETTERSEND).data
     }
 
 }

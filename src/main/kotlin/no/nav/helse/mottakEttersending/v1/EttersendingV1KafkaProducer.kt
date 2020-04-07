@@ -1,4 +1,4 @@
-package no.nav.helse.mottakOverføreDager
+package no.nav.helse.mottakEttersending.v1
 
 import kotlinx.io.core.toByteArray
 import no.nav.helse.Metadata
@@ -16,16 +16,16 @@ import org.apache.kafka.common.serialization.Serializer
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
-internal class SoknadOverforeDagerKafkaProducer(
+internal class EttersendingV1KafkaProducer(
     kafkaConfig: KafkaConfig
 ) : HealthCheck {
     private companion object {
-        private val NAME = "SoknadOverforeDagerProducer"
+        private val NAME = "EttersendingV1Producer"
         private val TOPIC_USE = TopicUse(
-            name = Topics.MOTTATT_OVERFORE_DAGER,
-            valueSerializer = SoknadV1OutgoingSerialier()
+            name = Topics.MOTTATT_ETTERSEND,
+            valueSerializer = EttersendingV1OutgoingSerialier()
         )
-        private val logger = LoggerFactory.getLogger(SoknadOverforeDagerKafkaProducer::class.java)
+        private val logger = LoggerFactory.getLogger(EttersendingV1KafkaProducer::class.java)
     }
 
     private val producer = KafkaProducer<String, TopicEntry<JSONObject>>(
@@ -35,10 +35,10 @@ internal class SoknadOverforeDagerKafkaProducer(
     )
 
     internal fun produce(
-        soknad: SoknadOverforeDagerOutgoing,
+        soknad: EttersendingV1Outgoing,
         metadata: Metadata
     ) {
-        if (metadata.version != 1) throw IllegalStateException("Kan ikke legge søknad om overføring av omsorgsdager på versjon ${metadata.version} til prosessering.")
+        if (metadata.version != 1) throw IllegalStateException("Kan ikke legge ettersending på versjon ${metadata.version} til prosessering.")
 
         val recordMetaData = producer.send(
             ProducerRecord(
@@ -51,7 +51,7 @@ internal class SoknadOverforeDagerKafkaProducer(
             )
         ).get()
 
-        logger.info("Søknad om overføring av omsorgsdager sendt til Topic '${TOPIC_USE.name}' med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'")
+        logger.info("Ettersending sendt til Topic '${TOPIC_USE.name}' med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'")
     }
 
 
@@ -68,7 +68,7 @@ internal class SoknadOverforeDagerKafkaProducer(
     }
 }
 
-private class SoknadV1OutgoingSerialier : Serializer<TopicEntry<JSONObject>> {
+private class EttersendingV1OutgoingSerialier : Serializer<TopicEntry<JSONObject>> {
     override fun serialize(topic: String, data: TopicEntry<JSONObject>) : ByteArray {
         val metadata = JSONObject()
             .put("correlationId", data.metadata.correlationId)
