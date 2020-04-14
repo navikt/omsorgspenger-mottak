@@ -22,6 +22,6 @@ internal class DittNavV1Service(
             soknadId = soknadId
         )
 
-        return "Kafkaproducer aktivert."
+        return "Melding sendt til Ditt Nav sin Kafka kø"
     }
 }
