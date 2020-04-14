@@ -27,7 +27,8 @@ object KafkaWrapper {
             topicNames= listOf(
                 Topics.MOTTATT,
                 Topics.MOTTATT_OVERFORE_DAGER,
-                Topics.MOTTATT_ETTERSEND
+                Topics.MOTTATT_ETTERSEND,
+                Topics.DITT_NAV_BESKJED
             )
         )
         return kafkaEnvironment

@@ -19,4 +19,5 @@ internal object Topics {
     internal const val MOTTATT = "privat-omsorgspengesoknad-mottatt"
     internal const val MOTTATT_OVERFORE_DAGER = "privat-overfore-omsorgsdager-soknad-mottatt"
     internal const val MOTTATT_ETTERSEND = "privat-omsorgspenger-ettersending-mottatt"
+    internal const val DITT_NAV_BESKJED = "aapen-brukernotifikasjon-nyBeskjed-v1"
 }
