@@ -227,7 +227,8 @@ class OmsorgspengerMottakTest {
         val soknad = """
         {
             "søker": {
-                "aktørId": "ABC"
+                "aktørId": "ABC",
+                "fødselsnummer": $gyldigFodselsnummerA
             },
             "vedlegg": [
             ]
@@ -504,7 +505,8 @@ class OmsorgspengerMottakTest {
         val soknad = """
         {
             "søker": {
-                "aktørId": "ABC"
+                "aktørId": "ABC",
+                "fødselsnummer": $gyldigFodselsnummerA
             },
             legeerklæring: [],
             samværsavtale: []
