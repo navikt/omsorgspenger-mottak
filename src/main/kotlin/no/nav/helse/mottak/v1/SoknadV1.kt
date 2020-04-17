@@ -23,6 +23,10 @@ internal class SoknadV1Incoming(json: String) {
     internal val legeerklæring: List<Vedlegg>
     internal val samværsavtale: List<Vedlegg>
 
+    internal val sokerFodselsNummer = jsonObject.getJSONObject(JsonKeys.søker).getString(
+        JsonKeys.fødselsnummer
+    )
+
     private fun hentLegeerklæring(): List<Vedlegg> = vedleggsFilerTilJson(JsonKeys.legeerklæring).toList()
 
     private fun hentSamværsavtale(): List<Vedlegg> = vedleggsFilerTilJson(JsonKeys.samværsavtale).toList()

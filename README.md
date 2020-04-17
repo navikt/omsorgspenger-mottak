@@ -21,8 +21,8 @@ Tjenesten lagrer vedlegg slik at det kun er en referanse til vedleggene som legg
 ```json
 {
 	"soker": {
-        "aktoer_id": "1234567",
-		"fodselsnummer": "290990123456"
+        "aktørId": "1234567",
+		"fødselsnummer": "290990123456"
 	},
 	"vedlegg": [{
 		"content": "iVBORw0KGg....ayne82ZEAAAAASUVORK5CYII=",

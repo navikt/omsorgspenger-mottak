@@ -227,7 +227,8 @@ class OmsorgspengerMottakTest {
         val soknad = """
         {
             "søker": {
-                "aktørId": "ABC"
+                "aktørId": "ABC",
+                "fødselsnummer": $gyldigFodselsnummerA
             },
             "vedlegg": [
             ]
@@ -270,7 +271,6 @@ class OmsorgspengerMottakTest {
     fun `Gyldig søknad for overføring av dager blir lagt til prosessering`(){
         gyldigSoknadOverforeDagerBlirLagtTilProsessering(Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
         gyldigSoknadOverforeDagerBlirLagtTilProsessering(Azure.V2_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
-
     }
 
     private fun gyldigSoknadOverforeDagerBlirLagtTilProsessering(accessToken: String) {
@@ -372,7 +372,8 @@ class OmsorgspengerMottakTest {
         val soknad = """
         {
             "søker": {
-                "aktørId": "ABC"
+                "aktørId": "ABC",
+                "fødselsnummer": "02119970078"
             }
         }
         """.trimIndent()
@@ -504,7 +505,8 @@ class OmsorgspengerMottakTest {
         val soknad = """
         {
             "søker": {
-                "aktørId": "ABC"
+                "aktørId": "ABC",
+                "fødselsnummer": $gyldigFodselsnummerA
             },
             legeerklæring: [],
             samværsavtale: []

@@ -12,6 +12,7 @@ import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
 import no.nav.helse.Metadata
+import no.nav.helse.SoknadId
 import no.nav.helse.getSoknadId
 import no.nav.helse.mottakEttersending.v1.EttersendingV1Incoming
 import no.nav.helse.mottakEttersending.v1.EttersendingV1MottakService
@@ -27,43 +28,66 @@ private val logger: Logger = LoggerFactory.getLogger("no.nav.SoknadV1Api")
 internal fun Route.SoknadV1Api(
     soknadV1MottakService: SoknadV1MottakService,
     soknadOverforeDagerMottakService: SoknadOverforeDagerMottakService,
-    ettersendingV1MottakService: EttersendingV1MottakService
+    ettersendingV1MottakService: EttersendingV1MottakService,
+    dittNavV1Service: DittNavV1Service
 ) {
     post("v1/soknad") {
-        val soknadId = call.getSoknadId()
-        val metadata = call.metadata()
-        val soknad = call.soknad()
+        val soknadId: SoknadId = call.getSoknadId()
+        val metadata: Metadata = call.metadata()
+        val soknad: SoknadV1Incoming = call.soknad()
         soknadV1MottakService.leggTilProsessering(
             soknadId = soknadId,
             metadata = metadata,
             soknad = soknad
         )
+        sendBeskjedTilDittNav(
+            dittNavV1Service = dittNavV1Service,
+            dittNavTekst = "Søknad om ekstra omsorgsdager er mottatt.",
+            dittNavLink = "",
+            sokerFodselsNummer = soknad.sokerFodselsNummer,
+            soknadId = soknadId
+        )
         call.respond(HttpStatusCode.Accepted, mapOf("id" to soknadId.id))
     }
 
     post("v1/soknad/overfore-dager") {
-        val soknadId = call.getSoknadId()
-        val metadata = call.metadata()
-        val soknad = call.soknadOverforeDager()
+        val soknadId: SoknadId = call.getSoknadId()
+        val metadata: Metadata = call.metadata()
+        val soknad: SoknadOverforeDagerIncoming = call.soknadOverforeDager()
 
         soknadOverforeDagerMottakService.leggTilProsessering(
             soknadId = soknadId,
             metadata = metadata,
             soknad = soknad
         )
+        sendBeskjedTilDittNav(
+            dittNavV1Service = dittNavV1Service,
+            dittNavTekst = "Melding om overføring av omsorgsdager er mottatt.",
+            dittNavLink = "",
+            sokerFodselsNummer = soknad.sokerFodselsNummer,
+            soknadId = soknadId
+        )
         call.respond(HttpStatusCode.Accepted, mapOf("id" to soknadId.id))
     }
 
     post("v1/ettersend") {
-        val soknadId = call.getSoknadId()
-        val metadata = call.metadata()
-        val soknad = call.soknadEttersending()
+        val soknadId: SoknadId = call.getSoknadId()
+        val metadata: Metadata = call.metadata()
+        val soknad: EttersendingV1Incoming = call.soknadEttersending()
 
         ettersendingV1MottakService.leggTilProsessering(
             soknadId = soknadId,
             metadata = metadata,
             soknad = soknad
         )
+        // TODO: Kommenter inn for å sende melding om mottatt ettersending på Ditt NAV
+//        sendBeskjedTilDittNav(
+//            dittNavV1Service = dittNavV1Service,
+//            dittNavTekst = "Melding om ettersending av dokumenter er mottatt.",
+//            dittNavLink = "",
+//            sokerFodselsNummer = soknad.sokerFodselsNummer,
+//            soknadId = soknadId
+//        )
         call.respond(HttpStatusCode.Accepted, mapOf("id" to soknadId.id))
     }
 }
