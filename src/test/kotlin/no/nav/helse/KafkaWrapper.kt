@@ -92,5 +92,4 @@ private class SoknadV1OutgoingDeserialiser : Deserializer<TopicEntry<JSONObject>
         )
     }
     override fun close() {}
-
 }
