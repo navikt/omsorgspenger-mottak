@@ -28,8 +28,6 @@ import no.nav.helse.mottak.v1.DittNavV1Service
 import no.nav.helse.mottak.v1.SoknadV1Api
 import no.nav.helse.mottak.v1.SoknadV1KafkaProducer
 import no.nav.helse.mottak.v1.SoknadV1MottakService
-import no.nav.helse.mottakEttersending.v1.EttersendingV1KafkaProducer
-import no.nav.helse.mottakEttersending.v1.EttersendingV1MottakService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -91,16 +89,9 @@ fun Application.omsorgspengerMottak() {
         kafkaConfig = configuration.getKafkaConfig()
     )
 
-    val ettersendingV1KafkaProducer =
-        EttersendingV1KafkaProducer(
-            kafkaConfig = configuration.getKafkaConfig()
-        )
-
-
     environment.monitor.subscribe(ApplicationStopping) {
         logger.info("Stopper Kafka Producer.")
         soknadV1KafkaProducer.stop()
-        ettersendingV1KafkaProducer.stop()
         logger.info("Kafka Producer Stoppet.")
     }
 
@@ -127,10 +118,6 @@ fun Application.omsorgspengerMottak() {
                     soknadV1MottakService = SoknadV1MottakService(
                         dokumentGateway = dokumentGateway,
                         soknadV1KafkaProducer = soknadV1KafkaProducer
-                    ),
-                    ettersendingV1MottakService = EttersendingV1MottakService(
-                        dokumentGateway = dokumentGateway,
-                        ettersendingV1KafkaProducer = ettersendingV1KafkaProducer
                     ),
                     dittNavV1Service = DittNavV1Service(
                         soknadV1KafkaProducer = soknadV1KafkaProducer
