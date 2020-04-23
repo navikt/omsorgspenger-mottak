@@ -22,8 +22,6 @@ import no.nav.helse.mottakEttersending.v1.EttersendingV1Incoming
 import no.nav.helse.mottakEttersending.v1.EttersendingV1Outgoing
 import no.nav.helse.kafka.Topics
 import no.nav.helse.mottak.v1.*
-import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerIncoming
-import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerOutgoing
 import org.apache.commons.codec.binary.Base64
 import org.json.JSONObject
 import org.junit.AfterClass
@@ -268,139 +266,6 @@ class OmsorgspengerMottakTest {
     }
 
     @Test
-    fun `Gyldig søknad for overføring av dager blir lagt til prosessering`(){
-        gyldigSoknadOverforeDagerBlirLagtTilProsessering(Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
-        gyldigSoknadOverforeDagerBlirLagtTilProsessering(Azure.V2_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
-    }
-
-    private fun gyldigSoknadOverforeDagerBlirLagtTilProsessering(accessToken: String) {
-        val soknad = gyldigSoknadOverforeDager(
-            fodselsnummerSoker = gyldigFodselsnummerA
-        )
-
-        val soknadId = requestAndAssert(
-            soknad = soknad,
-            expectedCode = HttpStatusCode.Accepted,
-            expectedResponse = null,
-            accessToken = accessToken,
-            path = "/v1/soknad/overfore-dager"
-        )
-
-        val sendtTilProsessering = hentSoknadOverforeDagerSendtTilProsessering(soknadId)
-        verifiserSoknadOverforeDagerLagtTilProsessering(
-            incomingJsonString = soknad,
-            outgoingJsonObject = sendtTilProsessering
-        )
-    }
-
-    @Test
-    fun `Gyldig søknad for overføring av dager fra D-nummer blir lagt til prosessering`() {
-        val soknad = gyldigSoknadOverforeDager(
-            fodselsnummerSoker = dNummerA
-        )
-
-        val soknadId = requestAndAssert(
-            soknad = soknad,
-            expectedCode = HttpStatusCode.Accepted,
-            expectedResponse = null,
-            path = "/v1/soknad/overfore-dager"
-        )
-
-        val sendtTilProsessering  = hentSoknadOverforeDagerSendtTilProsessering(soknadId)
-        verifiserSoknadOverforeDagerLagtTilProsessering(
-            incomingJsonString = soknad,
-            outgoingJsonObject = sendtTilProsessering
-        )
-    }
-
-    @Test
-    fun `Request fra ikke autorisert system feiler, søknad for overføring av dager`() {
-        val soknad = gyldigSoknadOverforeDager(
-            fodselsnummerSoker = gyldigFodselsnummerA
-        )
-
-        requestAndAssert(
-            soknad = soknad,
-            expectedCode = HttpStatusCode.Forbidden,
-            expectedResponse = """
-            {
-                "type": "/problem-details/unauthorized",
-                "title": "unauthorized",
-                "status": 403,
-                "detail": "Requesten inneholder ikke tilstrekkelige tilganger.",
-                "instance": "about:blank"
-            }
-            """.trimIndent(),
-            accessToken = unAauthorizedAccessToken,
-            path = "/v1/soknad/overfore-dager"
-        )
-    }
-
-    @Test
-    fun `Request uten corelation id feiler, søknad for overføring av dager`() {
-        val soknad = gyldigSoknadOverforeDager(
-            fodselsnummerSoker = gyldigFodselsnummerA
-        )
-
-        requestAndAssert(
-            soknad = soknad,
-            expectedCode = HttpStatusCode.BadRequest,
-            expectedResponse = """
-                {
-                    "type": "/problem-details/invalid-request-parameters",
-                    "title": "invalid-request-parameters",
-                    "detail": "Requesten inneholder ugyldige paramtere.",
-                    "status": 400,
-                    "instance": "about:blank",
-                    "invalid_parameters" : [
-                        {
-                            "name" : "X-Correlation-ID",
-                            "reason" : "Correlation ID må settes.",
-                            "type": "header",
-                            "invalid_value": null
-                        }
-                    ]
-                }
-            """.trimIndent(),
-            leggTilCorrelationId = false,
-            path = "/v1/soknad/overfore-dager"
-        )
-    }
-
-    @Test
-    fun `En ugyldig melding for overføring av dager gir valideringsfeil`() {
-        val soknad = """
-        {
-            "søker": {
-                "aktørId": "ABC",
-                "fødselsnummer": "02119970078"
-            }
-        }
-        """.trimIndent()
-
-        requestAndAssert(
-            soknad = soknad,
-            expectedCode = HttpStatusCode.BadRequest,
-            expectedResponse = """
-                {
-                    "type": "/problem-details/invalid-request-parameters",
-                    "title": "invalid-request-parameters",
-                    "status": 400,
-                    "detail": "Requesten inneholder ugyldige paramtere.",
-                    "instance": "about:blank",
-                    "invalid_parameters": [{
-                        "type": "entity",
-                        "name": "søker.aktørId",
-                        "reason": "Ikke gyldig Aktør ID.",
-                        "invalid_value": "ABC"
-                    }]
-                }
-            """.trimIndent(),
-            path = "/v1/soknad/overfore-dager"
-        )
-    }
-
-    @Test
     fun `Gyldig søknad blir lagt til prosessering`() {
         gyldigSoknadBlirLagtTilProsessering(Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
         gyldigSoknadBlirLagtTilProsessering(Azure.V2_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
@@ -551,22 +416,6 @@ class OmsorgspengerMottakTest {
         JSONAssert.assertEquals(outgoingFromIncoming.jsonObject.toString(), outgoing.jsonObject.toString(), true)
     }
 
-    private fun verifiserSoknadOverforeDagerLagtTilProsessering(
-        incomingJsonString: String,
-        outgoingJsonObject: JSONObject
-    ) {
-        val outgoing =
-            SoknadOverforeDagerOutgoing(outgoingJsonObject)
-
-        val outgoingFromIncoming = SoknadOverforeDagerIncoming(
-            incomingJsonString
-        )
-            .medSoknadId(outgoing.soknadId)
-            .somOutgoing()
-
-        JSONAssert.assertEquals(outgoingFromIncoming.jsonObject.toString(), outgoing.jsonObject.toString(), true)
-    }
-
     private fun verifiserEttersendingLagtTilProsessering(
         incomingJsonString: String,
         outgoingJsonObject: JSONObject
@@ -653,33 +502,6 @@ class OmsorgspengerMottakTest {
         }
         """.trimIndent()
 
-    private fun gyldigSoknadOverforeDager(
-        fodselsnummerSoker : String
-    ) : String =
-        """
-        {
-            "søker": {
-                "fødselsnummer": "$fodselsnummerSoker",
-                "aktørId": "123456"
-            },
-            "hvilke_som_helst_andre_atributter": {
-                  "språk": "nb",
-                  "arbeidssituasjon": ["arbeidstaker"],
-                  "medlemskap": {
-                    "harBoddIUtlandetSiste12Mnd": false,
-                    "utenlandsoppholdSiste12Mnd": [],
-                    "skalBoIUtlandetNeste12Mnd": false,
-                    "utenlandsoppholdNeste12Mnd": []
-                  },
-                  "harForståttRettigheterOgPlikter": true,
-                  "harBekreftetOpplysninger": true,
-                  "antallDager": 5,
-                  "mottakerAvDagerNorskIdentifikator": "$gyldigFodselsnummerB",
-                  "harSamfunnskritiskJobb": true
-                }
-            }
-        """.trimIndent()
-
     private fun gyldigEttersending(
         fodselsnummerSoker: String
     ) : String = """
@@ -711,10 +533,6 @@ class OmsorgspengerMottakTest {
         return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT).data
     }
 
-    private fun hentSoknadOverforeDagerSendtTilProsessering(soknadId: String?) : JSONObject {
-        assertNotNull(soknadId)
-        return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT_OVERFORE_DAGER).data
-    }
 
     private fun hentEttersendingSendtTilProsessering(soknadId: String?) : JSONObject {
         assertNotNull(soknadId)

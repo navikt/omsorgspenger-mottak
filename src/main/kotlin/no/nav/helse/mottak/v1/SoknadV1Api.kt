@@ -16,9 +16,6 @@ import no.nav.helse.SoknadId
 import no.nav.helse.getSoknadId
 import no.nav.helse.mottakEttersending.v1.EttersendingV1Incoming
 import no.nav.helse.mottakEttersending.v1.EttersendingV1MottakService
-import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerIncoming
-import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerMottakService
-import no.nav.helse.mottakOverføreDager.v1.validate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import validate
@@ -27,7 +24,6 @@ private val logger: Logger = LoggerFactory.getLogger("no.nav.SoknadV1Api")
 
 internal fun Route.SoknadV1Api(
     soknadV1MottakService: SoknadV1MottakService,
-    soknadOverforeDagerMottakService: SoknadOverforeDagerMottakService,
     ettersendingV1MottakService: EttersendingV1MottakService,
     dittNavV1Service: DittNavV1Service
 ) {
@@ -43,26 +39,6 @@ internal fun Route.SoknadV1Api(
         sendBeskjedTilDittNav(
             dittNavV1Service = dittNavV1Service,
             dittNavTekst = "Søknad om ekstra omsorgsdager er mottatt.",
-            dittNavLink = "",
-            sokerFodselsNummer = soknad.sokerFodselsNummer,
-            soknadId = soknadId
-        )
-        call.respond(HttpStatusCode.Accepted, mapOf("id" to soknadId.id))
-    }
-
-    post("v1/soknad/overfore-dager") {
-        val soknadId: SoknadId = call.getSoknadId()
-        val metadata: Metadata = call.metadata()
-        val soknad: SoknadOverforeDagerIncoming = call.soknadOverforeDager()
-
-        soknadOverforeDagerMottakService.leggTilProsessering(
-            soknadId = soknadId,
-            metadata = metadata,
-            soknad = soknad
-        )
-        sendBeskjedTilDittNav(
-            dittNavV1Service = dittNavV1Service,
-            dittNavTekst = "Melding om overføring av omsorgsdager er mottatt.",
             dittNavLink = "",
             sokerFodselsNummer = soknad.sokerFodselsNummer,
             soknadId = soknadId
@@ -99,13 +75,6 @@ private suspend fun ApplicationCall.soknad() : SoknadV1Incoming {
     return incoming
 }
 
-private suspend fun ApplicationCall.soknadOverforeDager() : SoknadOverforeDagerIncoming {
-    val json = receiveStream().use { String(it.readAllBytes(), Charsets.UTF_8) }
-    val incoming = SoknadOverforeDagerIncoming(json)
-    incoming.validate()
-    return incoming
-}
-
 private suspend fun ApplicationCall.soknadEttersending() : EttersendingV1Incoming {
     val json = receiveStream().use { String(it.readAllBytes(), Charsets.UTF_8) }
     val incoming = EttersendingV1Incoming(json)
@@ -118,7 +87,6 @@ private fun ApplicationCall.metadata() = Metadata(
     correlationId = request.getCorrelationId(),
     requestId = response.getRequestId()
 )
-
 
 private fun ApplicationRequest.getCorrelationId(): String {
     return header(HttpHeaders.XCorrelationId) ?: throw IllegalStateException("Correlation Id ikke satt")
