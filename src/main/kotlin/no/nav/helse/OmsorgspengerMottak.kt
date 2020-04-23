@@ -8,8 +8,6 @@ import io.ktor.features.CallId
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.Url
 import io.ktor.jackson.jackson
 import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.routing.Routing
@@ -19,9 +17,6 @@ import io.prometheus.client.hotspot.DefaultExports
 import no.nav.helse.auth.AccessTokenClientResolver
 import no.nav.helse.dokument.DokumentGateway
 import no.nav.helse.dusseldorf.ktor.auth.*
-import no.nav.helse.dusseldorf.ktor.client.HttpRequestHealthCheck
-import no.nav.helse.dusseldorf.ktor.client.HttpRequestHealthConfig
-import no.nav.helse.dusseldorf.ktor.client.buildURL
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.dusseldorf.ktor.health.HealthService
@@ -35,11 +30,8 @@ import no.nav.helse.mottak.v1.SoknadV1KafkaProducer
 import no.nav.helse.mottak.v1.SoknadV1MottakService
 import no.nav.helse.mottakEttersending.v1.EttersendingV1KafkaProducer
 import no.nav.helse.mottakEttersending.v1.EttersendingV1MottakService
-import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerKafkaProducer
-import no.nav.helse.mottakOverføreDager.v1.SoknadOverforeDagerMottakService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.URI
 import java.util.*
 
 private val logger: Logger = LoggerFactory.getLogger("no.nav.OmsorgspengerMottak")
@@ -99,10 +91,6 @@ fun Application.omsorgspengerMottak() {
         kafkaConfig = configuration.getKafkaConfig()
     )
 
-    val soknadOverforeDagerKafkaProducer = SoknadOverforeDagerKafkaProducer(
-        kafkaConfig = configuration.getKafkaConfig()
-    )
-
     val ettersendingV1KafkaProducer =
         EttersendingV1KafkaProducer(
             kafkaConfig = configuration.getKafkaConfig()
@@ -112,7 +100,6 @@ fun Application.omsorgspengerMottak() {
     environment.monitor.subscribe(ApplicationStopping) {
         logger.info("Stopper Kafka Producer.")
         soknadV1KafkaProducer.stop()
-        soknadOverforeDagerKafkaProducer.stop()
         ettersendingV1KafkaProducer.stop()
         logger.info("Kafka Producer Stoppet.")
     }
@@ -140,9 +127,6 @@ fun Application.omsorgspengerMottak() {
                     soknadV1MottakService = SoknadV1MottakService(
                         dokumentGateway = dokumentGateway,
                         soknadV1KafkaProducer = soknadV1KafkaProducer
-                    ),
-                    soknadOverforeDagerMottakService = SoknadOverforeDagerMottakService(
-                        soknadOverforeDagerKafkaProducer = soknadOverforeDagerKafkaProducer
                     ),
                     ettersendingV1MottakService = EttersendingV1MottakService(
                         dokumentGateway = dokumentGateway,
