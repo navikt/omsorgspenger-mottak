@@ -1,6 +1,5 @@
 package no.nav.helse.mottak.v1
 
-import kotlinx.io.core.toByteArray
 import no.nav.brukernotifikasjon.schemas.Beskjed
 import no.nav.brukernotifikasjon.schemas.Nokkel
 import no.nav.helse.Metadata
