@@ -11,6 +11,8 @@ import io.ktor.response.ApplicationResponse
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import no.nav.helse.Metadata
 import no.nav.helse.SoknadId
 import no.nav.helse.getSoknadId
@@ -27,12 +29,14 @@ internal fun Route.SoknadV1Api(
     post("v1/soknad") {
         val soknadId: SoknadId = call.getSoknadId()
         val metadata: Metadata = call.metadata()
-        val soknad: SoknadV1Incoming = call.soknad()
+        val soknad: SoknadV1Incoming = withContext(Dispatchers.IO) {call.soknad()}
+
         soknadV1MottakService.leggTilProsessering(
             soknadId = soknadId,
             metadata = metadata,
             soknad = soknad
         )
+
         sendBeskjedTilDittNav(
             dittNavV1Service = dittNavV1Service,
             dittNavTekst = "Søknad om ekstra omsorgsdager er mottatt.",
