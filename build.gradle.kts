@@ -40,28 +40,28 @@ repositories {
 
 dependencies {
     // Server
-    compile("no.nav.helse:dusseldorf-ktor-core:$dusseldorfKtorVersion")
-    compile("no.nav.helse:dusseldorf-ktor-jackson:$dusseldorfKtorVersion")
-    compile("no.nav.helse:dusseldorf-ktor-metrics:$dusseldorfKtorVersion")
-    compile("no.nav.helse:dusseldorf-ktor-health:$dusseldorfKtorVersion")
-    compile("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfKtorVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfKtorVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-jackson:$dusseldorfKtorVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-metrics:$dusseldorfKtorVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-health:$dusseldorfKtorVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfKtorVersion")
 
     // Client
-    compile("no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
-    compile("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfKtorVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
+    implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfKtorVersion")
 
     // Kafka
-    compile("org.apache.kafka:kafka-clients:$kafkaVersion")
-    compile("no.nav:brukernotifikasjon-schemas:$brukernotifikasjonSchemaVersion")
-    compile("io.confluent:kafka-avro-serializer:$confluentVersion")
+    implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
+    implementation("no.nav:brukernotifikasjon-schemas:$brukernotifikasjonSchemaVersion")
+    implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
 
     // Test
-    testCompile("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion")
-    testCompile("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
-    testCompile("io.ktor:ktor-server-test-host:$ktorVersion") {
+    testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion")
+    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
-    testCompile("org.skyscreamer:jsonassert:1.5.0")
+    testImplementation("org.skyscreamer:jsonassert:1.5.0")
 }
 
 java {
@@ -89,20 +89,4 @@ tasks.withType<ShadowJar> {
 
 tasks.withType<Wrapper> {
     gradleVersion = "6.7.1"
-}
-
-tasks.register("createDependabotFile") {
-    doLast {
-        mkdir("$projectDir/dependabot")
-        val file = File("$projectDir/dependabot/build.gradle")
-        file.writeText( "// Do not edit manually! This file was created by the 'createDependabotFile' task defined in the root build.gradle.kts file.\n")
-        file.appendText("dependencies {\n")
-        project.configurations.getByName("runtimeClasspath").allDependencies
-            .filter { it.group != rootProject.name && it.version != null }
-            .forEach { file.appendText("    compile '${it.group}:${it.name}:${it.version}'\n") }
-        project.configurations.getByName("testRuntimeClasspath").allDependencies
-            .filter { it.group != rootProject.name && it.version != null }
-            .forEach { file.appendText("    testCompile '${it.group}:${it.name}:${it.version}'\n") }
-        file.appendText("}\n")
-    }
 }
