@@ -6,7 +6,7 @@ val ktorVersion = ext.get("ktorVersion").toString()
 val kafkaEmbeddedEnvVersion = "2.2.0"
 val kafkaVersion = "2.3.0" // Alligned med version fra kafka-embedded-env
 val brukernotifikasjonSchemaVersion = "1.2020.02.07-13.16-fa9d319688b1"
-val confluentVersion = "5.2.0"
+val confluentVersion = "6.0.1"
 
 val mainClass = "no.nav.helse.OmsorgspengerMottakKt"
 
