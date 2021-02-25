@@ -1,7 +1,5 @@
 package no.nav.helse.kafka
 
-import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
-import io.confluent.kafka.serializers.KafkaAvroSerializer
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.config.SaslConfigs
@@ -27,13 +25,6 @@ internal class KafkaConfig(
 
     internal fun producer(name: String) = producer.apply {
         put(ProducerConfig.CLIENT_ID_CONFIG, "$ID_PREFIX$name")
-    }
-
-    internal fun producerDittNavMelding(name: String) = producer.apply {
-        put(ProducerConfig.CLIENT_ID_CONFIG, "$ID_PREFIX$name")
-        put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer::class.java)
-        put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer::class.java)
-        put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, getEnvVar("KAFKA_SCHEMAREGISTRY_SERVERS", "http://localhost:8141"))
     }
 }
 

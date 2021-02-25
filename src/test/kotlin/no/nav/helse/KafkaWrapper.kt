@@ -26,8 +26,7 @@ object KafkaWrapper {
             withSecurity = true,
             topicNames= listOf(
                 Topics.MOTTATT,
-                Topics.MOTTATT_ETTERSEND,
-                Topics.DITT_NAV_BESKJED
+                Topics.MOTTATT_ETTERSEND
             )
         )
         return kafkaEnvironment
