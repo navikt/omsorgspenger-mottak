@@ -28,6 +28,7 @@ import org.junit.BeforeClass
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -253,6 +254,22 @@ class OmsorgspengerMottakTest {
         )
     }
 
+    @Test
+    fun `Gyldig søknad med søknadId på request body`() {
+        val forventetSøknadId = UUID.randomUUID().toString()
+        val soknad = gyldigSoknad(
+            fodselsnummerSoker = dNummerA,
+            søknadId = forventetSøknadId
+        )
+
+        requestAndAssert(
+            soknad = soknad,
+            expectedCode = HttpStatusCode.Accepted,
+            expectedResponse = """{"id":"$forventetSøknadId"}""",
+            path = "/v1/soknad"
+        )
+    }
+
     // Utils
     private fun verifiserSoknadLagtTilProsessering(
         incomingJsonString: String,
@@ -311,10 +328,17 @@ class OmsorgspengerMottakTest {
 
 
     private fun gyldigSoknad(
-        fodselsnummerSoker : String
+        fodselsnummerSoker : String,
+        søknadId: String? = null
     ) : String =
         """
         {
+            "${JsonKeys.søknadId}": ${
+                when (søknadId) {
+                    null -> null
+                    else -> "$søknadId"
+                }
+            },
             "søker": {
                 "fødselsnummer": "$fodselsnummerSoker",
                 "aktørId": "123456"
@@ -335,32 +359,6 @@ class OmsorgspengerMottakTest {
             }
         }
         """.trimIndent()
-
-    private fun gyldigEttersending(
-        fodselsnummerSoker: String
-    ) : String = """
-        {
-          "søker": {
-            "fødselsnummer": "$fodselsnummerSoker",
-            "aktørId": "123456"
-          },
-          "vedlegg": [
-            {
-              "content": "http://localhost:8081/vedlegg/1",
-              "contentType": "noe",
-              "title": "tittel-over-vedlegg "
-            }
-          ],
-          "hvilke_som_helst_andre_atributter": {
-            "språk": "nb",
-            "søknadstype": [
-              "ukjent"
-            ],
-            "harForståttRettigheterOgPlikter": true,
-            "harBekreftetOpplysninger": true
-          }
-        }
-    """.trimIndent()
 
     private fun hentSoknadSendtTilProsessering(soknadId: String?) : JSONObject {
         assertNotNull(soknadId)
