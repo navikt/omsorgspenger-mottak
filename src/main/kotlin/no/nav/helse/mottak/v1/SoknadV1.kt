@@ -6,7 +6,7 @@ import org.json.JSONObject
 import java.net.URI
 import java.util.*
 
-private object JsonKeys {
+object JsonKeys {
     internal const val legeerklæring = "legeerklæring"
     internal const val samværsavtale = "samværsavtale"
     internal const val søker = "søker"
@@ -22,6 +22,12 @@ internal class SoknadV1Incoming(json: String) {
     private val jsonObject = JSONObject(json)
     internal val legeerklæring: List<Vedlegg>
     internal val samværsavtale: List<Vedlegg>
+    internal val søknadId: SoknadId?
+
+    private fun hentSøknadId(): SoknadId? = when(val søknadId = jsonObject.optString(JsonKeys.søknadId, "")) {
+        "" -> null
+        else -> SoknadId(søknadId)
+    }
 
     internal val sokerFodselsNummer = jsonObject.getJSONObject(JsonKeys.søker).getString(
         JsonKeys.fødselsnummer
@@ -49,6 +55,7 @@ internal class SoknadV1Incoming(json: String) {
     init {
         legeerklæring = hentLegeerklæring()
         samværsavtale = hentSamværsavtale()
+        søknadId = hentSøknadId()
         jsonObject.remove(JsonKeys.legeerklæring)
         jsonObject.remove(JsonKeys.samværsavtale)
     }
@@ -66,7 +73,10 @@ internal class SoknadV1Incoming(json: String) {
     }
 
     internal fun medSoknadId(soknadId: SoknadId): SoknadV1Incoming {
-        jsonObject.put(JsonKeys.søknadId, soknadId.id)
+        when (søknadId) {
+            null -> jsonObject.put(JsonKeys.søknadId, soknadId.id)
+            else -> jsonObject.put(JsonKeys.søknadId, søknadId.id)
+        }
         return this
     }
 
