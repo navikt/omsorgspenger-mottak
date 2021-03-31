@@ -2,7 +2,7 @@ package no.nav.helse
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import io.ktor.application.*
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -56,7 +56,7 @@ fun Application.omsorgspengerMottak() {
     install(ContentNegotiation) {
         jackson {
             dusseldorfConfigured()
-                .setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE)
+                .setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
         }
     }
 
@@ -136,5 +136,5 @@ internal fun ApplicationCall.getSoknadId() = SoknadId(attributes[soknadIdAttribu
 
 internal fun ObjectMapper.k9DokumentKonfigurert(): ObjectMapper = dusseldorfConfigured().apply {
     configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    propertyNamingStrategy = PropertyNamingStrategy.SNAKE_CASE
+    propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
 }
