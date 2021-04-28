@@ -63,7 +63,7 @@ class OmsorgspengerMottakTest {
         private val objectMapper = jacksonObjectMapper().dusseldorfConfigured()
 
         private val authorizedAccessToken = Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak")
-        private val unAauthorizedAccessToken = Azure.V2_0.generateJwt(clientId = "ikke-authorized-client", audience = "omsorgspenger-mottak")
+        private val unAauthorizedAccessToken = Azure.V2_0.generateJwt(clientId = "ikke-authorized-client", audience = "omsorgspenger-mottak", accessAsApplication = false)
 
         private var engine = newEngine(kafkaEnvironment)
 
@@ -72,8 +72,7 @@ class OmsorgspengerMottakTest {
             val testConfig = ConfigFactory.parseMap(TestConfiguration.asMap(
                 wireMockServer = wireMockServer,
                 kafkaEnvironment = kafkaEnvironment,
-                omsorgspengerMottakAzureClientId = "omsorgspenger-mottak",
-                azureAuthorizedClients = setOf("omsorgspenger-api")
+                omsorgspengerMottakAzureClientId = "omsorgspenger-mottak"
             ))
             val mergedConfig = testConfig.withFallback(fileConfig)
             return HoconApplicationConfig(mergedConfig)
@@ -122,8 +121,8 @@ class OmsorgspengerMottakTest {
 
     @Test
     fun `Gyldig søknad blir lagt til prosessering`() {
-        gyldigSoknadBlirLagtTilProsessering(Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
-        gyldigSoknadBlirLagtTilProsessering(Azure.V2_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak"))
+        gyldigSoknadBlirLagtTilProsessering(Azure.V1_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak", roles = setOf("access_as_application")))
+        gyldigSoknadBlirLagtTilProsessering(Azure.V2_0.generateJwt(clientId = "omsorgspenger-api", audience = "omsorgspenger-mottak", roles = setOf("access_as_application")))
     }
 
     private fun gyldigSoknadBlirLagtTilProsessering(accessToken: String) {
