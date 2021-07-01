@@ -4,6 +4,7 @@
   "namespace": "dusseldorf",
   "team": "dusseldorf",
   "tenant" : "trygdeetaten.no",
+  "omsorgspenger-api-cluster" : "dev-gcp",
   "minReplicas": "1",
   "maxReplicas": "2",
   "ingresses": [

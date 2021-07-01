@@ -11,6 +11,12 @@ spec:
     application:
       enabled: true
       tenant: {{tenant}}
+  accessPolicy:
+    inbound:
+      rules:
+        - application: omsorgspenger-api
+          namespace: dusseldorf
+          cluster: {{omsorgspenger-api-cluster}}
   port: 8080
   liveness:
     path: isalive
