@@ -11,9 +11,6 @@
     "https://omsorgspenger-mottak.nais.preprod.local",
     "https://omsorgspenger-mottak.dev-fss-pub.nais.io"
   ],
-  "vaultKvPath": "/kv/preprod/fss/omsorgspenger-mottak/dusseldorf",
-  "azureadKvPath": "/azuread/data/dev/creds/omsorgspenger-mottak",
-  "serviceuserKvPath": "/serviceuser/data/dev/srvomsorgspeng-mtk",
   "env": {
     "K9_DOKUMENT_BASE_URL": "https://k9-dokument.nais.preprod.local",
     "AZURE_V1_DISCOVERY_ENDPOINT": "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/.well-known/openid-configuration",
