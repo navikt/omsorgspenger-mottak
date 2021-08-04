@@ -13,7 +13,6 @@ import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.createTestEnvironment
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
-import io.ktor.util.KtorExperimentalAPI
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.dusseldorf.ktor.core.fromResources
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
@@ -34,10 +33,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@KtorExperimentalAPI
 class OmsorgspengerMottakTest {
 
-    @KtorExperimentalAPI
     private companion object {
         private val logger: Logger = LoggerFactory.getLogger(OmsorgspengerMottakTest::class.java)
 

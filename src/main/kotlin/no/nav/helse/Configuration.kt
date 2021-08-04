@@ -1,7 +1,6 @@
 package no.nav.helse
 
 import io.ktor.config.ApplicationConfig
-import io.ktor.util.KtorExperimentalAPI
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.getOptionalString
 import no.nav.helse.dusseldorf.ktor.core.getRequiredList
@@ -9,7 +8,6 @@ import no.nav.helse.dusseldorf.ktor.core.getRequiredString
 import no.nav.helse.kafka.KafkaConfig
 import java.net.URI
 
-@KtorExperimentalAPI
 data class Configuration(private val config : ApplicationConfig) {
 
     private val issuers = config.issuers()

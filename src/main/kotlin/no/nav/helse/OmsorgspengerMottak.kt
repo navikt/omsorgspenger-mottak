@@ -14,7 +14,6 @@ import io.ktor.jackson.jackson
 import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.routing.Routing
 import io.ktor.util.AttributeKey
-import io.ktor.util.KtorExperimentalAPI
 import io.prometheus.client.hotspot.DefaultExports
 import no.nav.helse.auth.AccessTokenClientResolver
 import no.nav.helse.dokument.DokumentGateway
@@ -39,7 +38,6 @@ private val soknadIdAttributeKey = AttributeKey<String>(soknadIdKey)
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-@KtorExperimentalAPI
 fun Application.omsorgspengerMottak() {
     val appId = environment.config.id()
     logProxyProperties()
