@@ -360,11 +360,4 @@ class OmsorgspengerMottakTest {
         assertNotNull(soknadId)
         return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT).data
     }
-
-
-    private fun hentEttersendingSendtTilProsessering(soknadId: String?) : JSONObject {
-        assertNotNull(soknadId)
-        return kafkaTestConsumer.hentSoknad(soknadId, topic = Topics.MOTTATT_ETTERSEND).data
-    }
-
 }

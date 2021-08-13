@@ -17,6 +17,8 @@ spec:
         - application: omsorgspenger-api
           namespace: dusseldorf
           cluster: {{omsorgspenger-api-cluster}}
+  kafka:
+    pool: {{kafka-pool}}
   port: 8080
   liveness:
     path: isalive

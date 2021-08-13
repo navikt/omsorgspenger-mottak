@@ -34,8 +34,8 @@ internal class SoknadV1KafkaProducer(
         TOPIC_USE.valueSerializer
     )
 
-    internal fun produce(
-        soknad: SoknadV1Outgoing,
+    internal fun produserKafkaMelding(
+        søknad: SoknadV1Outgoing,
         metadata: Metadata
     ) {
         if (metadata.version != 1) throw IllegalStateException("Kan ikke legge søknad på versjon ${metadata.version} til prosessering.")
@@ -43,10 +43,10 @@ internal class SoknadV1KafkaProducer(
         val recordMetaData = producer.send(
             ProducerRecord(
                 TOPIC_USE.name,
-                soknad.soknadId.id,
+                søknad.soknadId.id,
                 TopicEntry(
                     metadata = metadata,
-                    data = soknad.jsonObject
+                    data = søknad.jsonObject
                 )
             )
         ).get()

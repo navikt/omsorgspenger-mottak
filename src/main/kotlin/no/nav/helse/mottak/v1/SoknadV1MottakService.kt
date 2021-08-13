@@ -51,9 +51,9 @@ internal class SoknadV1MottakService(
             .somOutgoing()
 
         logger.info("Legger på kø")
-        soknadV1KafkaProducer.produce(
+        soknadV1KafkaProducer.produserKafkaMelding(
             metadata = metadata,
-            soknad = outgoing
+            søknad = outgoing
         )
 
         return soknadId
